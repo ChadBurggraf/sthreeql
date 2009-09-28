@@ -227,11 +227,7 @@ namespace SThreeQL
         {
             string restoreCatalogPath = Path.Combine(Config.RestorePath, String.Concat(Config.RestoreCatalogName, ".mdf"));
             string restoreLogPath = Path.Combine(Config.RestorePath, String.Concat(Config.RestoreCatalogName, "_log.ldf"));
-            string connectionString = String.Concat(
-                "data source=", Config.DataSource, ";",
-                "user id=", Config.UserId, ";",
-                "password=", Config.Password, ";"
-            );
+            string connectionString = Common.CreateConnectionString(Config);
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -241,6 +237,7 @@ namespace SThreeQL
                 {
                     using (SqlCommand command = connection.CreateCommand())
                     {
+                        command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
                         command.CommandText = String.Format(
                             Common.GetEmbeddedResourceText("SThreeQL.Drop.sql"),
@@ -280,6 +277,7 @@ namespace SThreeQL
                 {
                     using (SqlCommand command = connection.CreateCommand())
                     {
+                        command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
                         command.CommandText = Common.GetEmbeddedResourceText("SThreeQL.Restore.sql");
 

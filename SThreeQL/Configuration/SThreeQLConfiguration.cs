@@ -30,6 +30,15 @@ namespace SThreeQL.Configuration
         }
 
         /// <summary>
+        /// Gets the timeout, in seconds, for database connections and commands.
+        /// </summary>
+        [ConfigurationProperty("databaseTimeout", IsRequired = false)]
+        public int DatabaseTimeout
+        {
+            get { return (int)(this["databaseTimeout"] ?? 600); }
+        }
+
+        /// <summary>
         /// Gets the collection of restore database targets.
         /// </summary>
         [ConfigurationProperty("restoreTargets")]

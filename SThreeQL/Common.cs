@@ -81,6 +81,21 @@ namespace SThreeQL
         }
 
         /// <summary>
+        /// Creates a connection string from the given database target configuration.
+        /// </summary>
+        /// <param name="config">The database target to create a connection string for.</param>
+        /// <returns>A connection string.</returns>
+        public static string CreateConnectionString(DatabaseTargetConfigurationElement config)
+        {
+            return String.Concat(
+                "data source=", config.DataSource, ";",
+                "user id=", config.UserId, ";",
+                "password=", config.Password, ";",
+                "connection timeout=", SThreeQLConfiguration.Section.DatabaseTimeout, ";"
+            );
+        }
+
+        /// <summary>
         /// Creates a process that can be used to invoke WinRAR.
         /// </summary>
         /// <returns>The created process.</returns>

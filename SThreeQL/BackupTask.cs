@@ -103,13 +103,7 @@ namespace SThreeQL
                 File.Delete(TempPath);
             }
 
-            string connectionString = String.Concat(
-                "data source=", Config.DataSource, ";",
-                "user id=", Config.UserId, ";",
-                "password=", Config.Password, ";"
-            );
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(Common.CreateConnectionString(Config)))
             {
                 connection.Open();
 
@@ -117,6 +111,7 @@ namespace SThreeQL
                 {
                     using (SqlCommand command = connection.CreateCommand())
                     {
+                        command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
                         command.CommandText = Common.GetEmbeddedResourceText("SThreeQL.Backup.sql");
 

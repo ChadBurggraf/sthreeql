@@ -15,6 +15,11 @@ namespace SThreeQL
     public abstract class AWSTask
     {
         /// <summary>
+        /// Gets the number of seconds to use for SQL connection timeouts.
+        /// </summary>
+        protected const int CONNECTION_TIMEOUT = 600;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="awsConfig">The <see cref="AWSTargetConfigurationElement"/> to use when building the AWS service.</param>

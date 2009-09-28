@@ -141,7 +141,14 @@ namespace SThreeQL.Service
         protected override void OnContinue()
         {
             running = true;
-            Process();
+
+            new SetTimeoutDelegate(delegate()
+            {
+                Thread.Sleep(1000);
+            }).BeginInvoke(new AsyncCallback(delegate(IAsyncResult result)
+            {
+                Process();
+            }), new object());
         }
 
         /// <summary>
@@ -158,7 +165,14 @@ namespace SThreeQL.Service
         protected override void OnStart(string[] args)
         {
             running = true;
-            Process();
+
+            new SetTimeoutDelegate(delegate()
+            {
+                Thread.Sleep(1000);
+            }).BeginInvoke(new AsyncCallback(delegate(IAsyncResult result)
+            {
+                Process();
+            }), new object());
         }
 
         /// <summary>
