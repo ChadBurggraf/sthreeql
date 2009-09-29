@@ -18,7 +18,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("awsBucketName", IsRequired = true)]
         public string AWSBucketName
         {
-            get { return (string)(this["awsBucketName"] ?? String.Empty); }
+            get { return (string)this["awsBucketName"]; }
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("catalogName", IsRequired = true)]
         public string CatalogName
         {
-            get { return (string)(this["catalogName"] ?? String.Empty); }
+            get { return (string)this["catalogName"]; }
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("dataSource", IsRequired = true)]
         public string DataSource
         {
-            get { return (string)(this["dataSource"] ?? String.Empty); }
+            get { return (string)this["dataSource"]; }
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("name", IsKey = true, IsRequired = true)]
         public string Name
         {
-            get { return (string)(this["name"] ?? String.Empty); }
+            get { return (string)this["name"]; }
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("password", IsRequired = true)]
         public string Password
         {
-            get { return (string)(this["password"] ?? String.Empty); }
+            get { return (string)this["password"]; }
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("userId", IsRequired = true)]
         public string UserId
         {
-            get { return (string)(this["userId"] ?? String.Empty); }
+            get { return (string)this["userId"]; }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -23,11 +24,12 @@ namespace SThreeQL.Configuration
 
         /// <summary>
         /// Gets the temporary storage directory to use for targets in this collection.
+        /// Defaults to the system temporary directy when empty.
         /// </summary>
-        [ConfigurationProperty("tempDir", IsRequired = true)]
+        [ConfigurationProperty("tempDir", IsRequired = false)]
         public string TempDir
         {
-            get { return (string)(base["tempDir"] ?? String.Empty); }
+            get { return base["tempDir"].ToStringWithDefault(Path.GetTempPath()); }
         }
 
         /// <summary>

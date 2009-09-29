@@ -12,21 +12,13 @@ namespace SThreeQL.Configuration
     public class DatabaseRestoreTargetConfigurationElement : DatabaseTargetConfigurationElement
     {
         /// <summary>
-        /// Gets the target's log name.
-        /// </summary>
-        [ConfigurationProperty("logName", IsRequired = true)]
-        public string LogName
-        {
-            get { return (string)(this["logName"] ?? String.Empty); }
-        }
-
-        /// <summary>
         /// Gets the target's restore catalog name.
+        /// Defaults to the value of <see cref="CatalogName"/> when empty.
         /// </summary>
-        [ConfigurationProperty("restoreCatalogName", IsRequired = true)]
+        [ConfigurationProperty("restoreCatalogName", IsRequired = false)]
         public string RestoreCatalogName
         {
-            get { return (string)(this["restoreCatalogName"] ?? String.Empty); }
+            get { return this["restoreCatalogName"].ToStringWithDefault(CatalogName); }
         }
 
         /// <summary>
@@ -35,7 +27,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("restorePath", IsRequired = true)]
         public string RestorePath
         {
-            get { return (string)(this["restorePath"] ?? String.Empty); }
+            get { return (string)this["restorePath"]; }
         }
     }
 }

@@ -17,7 +17,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("awsTargets")]
         public AWSTargetConfigurationElementCollection AWSTargets
         {
-            get { return (AWSTargetConfigurationElementCollection)(this["awsTargets"] ?? (this["awsTargets"] = new AWSTargetConfigurationElementCollection())); }
+            get { return (AWSTargetConfigurationElementCollection)(this["awsTargets"] ?? new AWSTargetConfigurationElementCollection()); }
         }
 
         /// <summary>
@@ -26,16 +26,16 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("backupTargets")]
         public DatabaseTargetConfigurationElementCollection BackupTargets
         {
-            get { return (DatabaseTargetConfigurationElementCollection)(this["backupTargets"] ?? (this["backupTargets"] = new DatabaseTargetConfigurationElementCollection())); }
+            get { return (DatabaseTargetConfigurationElementCollection)(this["backupTargets"] ?? new DatabaseTargetConfigurationElementCollection()); }
         }
 
         /// <summary>
         /// Gets the timeout, in seconds, for database connections and commands.
         /// </summary>
-        [ConfigurationProperty("databaseTimeout", IsRequired = false)]
+        [ConfigurationProperty("databaseTimeout", IsRequired = false, DefaultValue = 600)]
         public int DatabaseTimeout
         {
-            get { return (int)(this["databaseTimeout"] ?? 600); }
+            get { return (int)this["databaseTimeout"]; }
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("restoreTargets")]
         public DatabaseRestoreTargetConfigurationElementCollection RestoreTargets
         {
-            get { return (DatabaseRestoreTargetConfigurationElementCollection)(this["restoreTargets"] ?? (this["restoreTargets"] = new DatabaseRestoreTargetConfigurationElementCollection())); }
+            get { return (DatabaseRestoreTargetConfigurationElementCollection)(this["restoreTargets"] ?? new DatabaseRestoreTargetConfigurationElementCollection()); }
         }
 
         /// <summary>
@@ -58,10 +58,10 @@ namespace SThreeQL.Configuration
         /// <summary>
         /// Gets the interval, in hours, between processing runs when running as a service.
         /// </summary>
-        [ConfigurationProperty("serviceInterval", IsRequired = false)]
+        [ConfigurationProperty("serviceInterval", IsRequired = false, DefaultValue = 24d)]
         public double ServiceInterval
         {
-            get { return (double)(this["serviceInterval"] ?? 24); }
+            get { return (double)this["serviceInterval"]; }
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("useSsl", IsRequired = false)]
         public bool UseSSL
         {
-            get { return (bool)(this["useSsl"] ?? false); }
+            get { return (bool)this["useSsl"]; }
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("winRarLocation", IsRequired = false)]
         public string WinRarLocation
         {
-            get { return (string)(this["winRarLocation"] ?? String.Empty); }
+            get { return (string)this["winRarLocation"]; }
         }
     }
 }

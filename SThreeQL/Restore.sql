@@ -2,8 +2,6 @@
 FROM DISK = @Path
 WITH  
 	FILE = 1,  
-	MOVE @Name TO @RestoreCatalogPath,  
-	MOVE @LogName TO @RestoreLogPath,  
-	NOUNLOAD,  
+{0}NOUNLOAD,  
 	REPLACE,  
 	STATS = 10

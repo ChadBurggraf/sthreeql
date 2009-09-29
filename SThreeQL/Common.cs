@@ -251,6 +251,25 @@ namespace SThreeQL
         }
 
         /// <summary>
+        /// Converts the given object to an integer and replaces it
+        /// with the default value if it is null or 0.
+        /// </summary>
+        /// <param name="value">The object to convert.</param>
+        /// <param name="defaultValue">The default value to use if empty.</param>
+        /// <returns>An integer.</returns>
+        public static int ToIntWithDefault(this object value, int defaultValue)
+        {
+            int ret = Convert.ToInt32(value ?? 0);
+
+            if (ret == 0)
+            {
+                ret = defaultValue;
+            }
+
+            return ret;
+        }
+
+        /// <summary>
         /// Returns a string representation of the given DateTime object
         /// that conforms to ISO 8601 (in UTC).
         /// </summary>
@@ -260,6 +279,25 @@ namespace SThreeQL
         {
             dateTime = dateTime.ToUniversalTime();
             return String.Format("{0:s}.{0:fff}Z", dateTime);
+        }
+
+        /// <summary>
+        /// Converts the given object to a string and replaces it with the given
+        /// default value if it is null or empty.
+        /// </summary>
+        /// <param name="value">The object to convert.</param>
+        /// <param name="defaultValue">The default value to use if empty.</param>
+        /// <returns>A string.</returns>
+        public static string ToStringWithDefault(this object value, string defaultValue)
+        {
+            string ret = (value ?? String.Empty).ToString();
+
+            if (String.IsNullOrEmpty(ret))
+            {
+                ret = defaultValue;
+            }
+
+            return ret;
         }
 
         /// <summary>

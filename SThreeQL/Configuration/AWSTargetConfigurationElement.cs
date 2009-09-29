@@ -17,7 +17,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("awsAccessKeyId", IsRequired = true)]
         public string AWSAccessKeyId
         {
-            get { return (string)(this["awsAccessKeyId"] ?? String.Empty); }
+            get { return (string)this["awsAccessKeyId"]; }
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("awsSecretAccessKeyId", IsRequired = true)]
         public string AWSSecretAccessKeyId
         {
-            get { return (string)(this["awsSecretAccessKeyId"] ?? String.Empty); }
+            get { return (string)this["awsSecretAccessKeyId"]; }
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("bucketName", IsKey = true, IsRequired = true)]
         public string BucketName
         {
-            get { return (string)(this["bucketName"] ?? String.Empty); }
+            get { return (string)this["bucketName"]; }
         }
     }
 }

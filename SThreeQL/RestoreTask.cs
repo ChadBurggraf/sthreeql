@@ -225,8 +225,6 @@ namespace SThreeQL
         /// </summary>
         private void RestoreDatabase()
         {
-            string restoreCatalogPath = Path.Combine(Config.RestorePath, String.Concat(Config.RestoreCatalogName, ".mdf"));
-            string restoreLogPath = Path.Combine(Config.RestorePath, String.Concat(Config.RestoreCatalogName, "_log.ldf"));
             string connectionString = Common.CreateConnectionString(Config);
 
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -254,16 +252,6 @@ namespace SThreeQL
 
             SqlConnection.ClearAllPools();
 
-            if (File.Exists(restoreCatalogPath))
-            {
-                File.Delete(restoreCatalogPath);
-            }
-
-            if (File.Exists(restoreLogPath))
-            {
-                File.Delete(restoreLogPath);
-            }
-
             if (!Directory.Exists(Config.RestorePath))
             {
                 Directory.CreateDirectory(Config.RestorePath);
@@ -275,18 +263,53 @@ namespace SThreeQL
 
                 try
                 {
+                    DataTable files = new DataTable();
+
                     using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
-                        command.CommandText = Common.GetEmbeddedResourceText("SThreeQL.Restore.sql");
+                        command.CommandText = Common.GetEmbeddedResourceText("SThreeQL.GetFiles.sql");
+
+                        command.Parameters.Add(new SqlParameter("@Path", TempPath));
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(files);
+                        }
+                    }
+
+                    using (SqlCommand command = connection.CreateCommand())
+                    {
+                        command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
+                        command.CommandType = CommandType.Text;
 
                         command.Parameters.Add(new SqlParameter("@RestoreCatalog", Config.RestoreCatalogName));
                         command.Parameters.Add(new SqlParameter("@Path", TempPath));
-                        command.Parameters.Add(new SqlParameter("@Name", Config.CatalogName));
-                        command.Parameters.Add(new SqlParameter("@LogName", Config.LogName));
-                        command.Parameters.Add(new SqlParameter("@RestoreCatalogPath", restoreCatalogPath));
-                        command.Parameters.Add(new SqlParameter("@RestoreLogPath", restoreLogPath));
+
+                        StringBuilder sb = new StringBuilder();
+
+                        for (int i = 0; i < files.Rows.Count; i++)
+                        {
+                            string name = files.Rows[i]["LogicalName"].ToString();
+                            string path = Path.Combine(Config.RestorePath, Path.GetFileName(files.Rows[i]["PhysicalName"].ToString()));
+
+                            command.Parameters.Add(new SqlParameter("@FileName" + i, name));
+                            command.Parameters.Add(new SqlParameter("@FilePath" + i, path));
+
+                            sb.Append(String.Concat("\tMOVE @FileName", i, " TO @FilePath", i, ",\n"));
+
+                            if (File.Exists(path))
+                            {
+                                File.Delete(path);
+                            }
+                            else if (Directory.Exists(path))
+                            {
+                                Directory.Delete(path, true);
+                            }
+                        }
+
+                        command.CommandText = String.Format(Common.GetEmbeddedResourceText("SThreeQL.Restore.sql"), sb.ToString());
 
                         command.ExecuteNonQuery();
                     }
