@@ -19,7 +19,7 @@ namespace SThreeQL.Service
         private bool running;
         int interval;
 
-        /// <summary>
+        /*/// <summary>
         /// Constructor.
         /// </summary>
         public SThreeQLProcessor()
@@ -61,7 +61,7 @@ namespace SThreeQL.Service
         /// </summary>
         protected void ProcessBackups()
         {
-            foreach (DatabaseTargetConfigurationElement config in SThreeQLConfiguration.Section.BackupTargets)
+            /*foreach (DatabaseTargetConfigurationElement config in SThreeQLConfiguration.Section.BackupTargets)
             {
                 try
                 {
@@ -84,7 +84,7 @@ namespace SThreeQL.Service
         /// </summary>
         protected void ProcessRestores()
         {
-            foreach (DatabaseRestoreTargetConfigurationElement config in SThreeQLConfiguration.Section.RestoreTargets)
+            /*foreach (DatabaseRestoreTargetConfigurationElement config in SThreeQLConfiguration.Section.RestoreTargets)
             {
                 try
                 {
@@ -183,6 +183,6 @@ namespace SThreeQL.Service
             running = false;
         }
 
-        #endregion
+        #endregion*/
     }
 }

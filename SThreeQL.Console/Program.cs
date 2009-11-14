@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using Affirma.ThreeSharp.Statistics;
 using SThreeQL.Configuration;
 
 namespace SThreeQL.Console
@@ -41,18 +43,21 @@ namespace SThreeQL.Console
 
                     if (config != null)
                     {
-                        Backup(config);
+                        new BackupTask(config).Execute(System.Console.Out, System.Console.Error);
                     }
                     else
                     {
                         System.Console.WriteLine(String.Concat("There is no backup task defined for the name \"", taskName, "\".\n"));
                     }
+
+                    System.Console.WriteLine();
                 }
                 else
                 {
                     foreach (DatabaseTargetConfigurationElement config in SThreeQLConfiguration.Section.BackupTargets)
                     {
-                        Backup(config);
+                        new BackupTask(config).Execute(System.Console.Out, System.Console.Error);
+                        System.Console.WriteLine();
                     }
                 }
             }
@@ -65,91 +70,27 @@ namespace SThreeQL.Console
 
                     if (config != null)
                     {
-                        Restore(config);
+                        new RestoreTask(config).Execute(System.Console.Out, System.Console.Error);
                     }
                     else
                     {
                         System.Console.WriteLine(String.Concat("There is no restore task defined for the name \"", taskName, "\".\n"));
                     }
+
+                    System.Console.WriteLine();
                 }
                 else
                 {
                     foreach (DatabaseRestoreTargetConfigurationElement config in SThreeQLConfiguration.Section.RestoreTargets)
                     {
-                        Restore(config);
+                        new RestoreTask(config).Execute(System.Console.Out, System.Console.Error);
+                        System.Console.WriteLine();
                     }
                 }
             }
 
             System.Console.WriteLine("Press any key to quit.");
             System.Console.ReadKey();
-        }
-
-        static void Backup(DatabaseTargetConfigurationElement config)
-        {
-            System.Console.WriteLine(String.Concat("Executing backup target ", config.Name, "..."));
-            System.Console.WriteLine("Backing up database...");
-
-            TaskExecutionResult result = new BackupTask(config, UploadProgress, UploadComplete).Execute();
-
-            if (result.Success)
-            {
-                System.Console.WriteLine("Done.");
-            }
-            else
-            {
-                System.Console.WriteLine(String.Concat("Failed: ", result.Exception.Message));
-            }
-
-            System.Console.WriteLine();
-        }
-
-        static void Restore(DatabaseRestoreTargetConfigurationElement config)
-        {
-            System.Console.WriteLine(String.Concat("Executing restore target ", config.Name, "..."));
-
-            TaskExecutionResult result = new RestoreTask(config, DownloadProgress, DownloadComplete).Execute();
-
-            if (result.Success)
-            {
-                System.Console.WriteLine("Done.");
-            }
-            else
-            {
-                System.Console.WriteLine(String.Concat("Failed: ", result.Exception.Message));
-            }
-
-            System.Console.WriteLine();
-        }
-
-        static void DownloadComplete()
-        {
-            System.Console.WriteLine("\nRestoring database...");
-        }
-
-        static void DownloadProgress(int percentComplete)
-        {
-            if (System.Console.CursorLeft > 0)
-            {
-                System.Console.CursorLeft = 0;
-            }
-
-            System.Console.Write(String.Format("Downloading: {0:###}%", percentComplete));
-        }
-
-        static void UploadComplete()
-        {
-            System.Console.WriteLine();
-        }
-
-        static void UploadProgress(int percentComplete)
-        {
-            if (System.Console.CursorLeft > 0)
-            {
-                System.Console.CursorLeft = 0;
-            }
-
-            System.Console.Write(String.Format("Uploading: {0:###}%", percentComplete));
         }
     }
 }

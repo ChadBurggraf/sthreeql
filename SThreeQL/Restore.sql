@@ -2,6 +2,4 @@
 FROM DISK = @Path
 WITH  
 	FILE = 1,  
-{0}NOUNLOAD,  
-	REPLACE,  
-	STATS = 10
+{0}REPLACE

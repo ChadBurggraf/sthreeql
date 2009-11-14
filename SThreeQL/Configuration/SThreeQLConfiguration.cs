@@ -56,15 +56,6 @@ namespace SThreeQL.Configuration
         }
 
         /// <summary>
-        /// Gets the interval, in hours, between processing runs when running as a service.
-        /// </summary>
-        [ConfigurationProperty("serviceInterval", IsRequired = false, DefaultValue = 24d)]
-        public double ServiceInterval
-        {
-            get { return (double)this["serviceInterval"]; }
-        }
-
-        /// <summary>
         /// Gets a value indicating whether to use SSL when communicating with AWS.
         /// </summary>
         [ConfigurationProperty("useSsl", IsRequired = false)]

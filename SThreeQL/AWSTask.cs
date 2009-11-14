@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Affirma.ThreeSharp;
 using Affirma.ThreeSharp.Model;
 using Affirma.ThreeSharp.Query;
+using Affirma.ThreeSharp.Statistics;
 using SThreeQL.Configuration;
 
 namespace SThreeQL
@@ -23,9 +25,7 @@ namespace SThreeQL
         /// Constructor.
         /// </summary>
         /// <param name="awsConfig">The <see cref="AWSTargetConfigurationElement"/> to use when building the AWS service.</param>
-        /// <param name="progressAction">The action to call for progress notifications.</param>
-        /// <param name="completeAction">The action to call when the network activity is complete.</param>
-        protected AWSTask(AWSTargetConfigurationElement awsConfig, Action<int> progressAction, Action completeAction)
+        protected AWSTask(AWSTargetConfigurationElement awsConfig)
         {
             if (awsConfig == null)
             {
@@ -42,26 +42,12 @@ namespace SThreeQL
             ServiceConfig.Format = CallingFormat.SUBDOMAIN;
 
             Service = new ThreeSharpQuery(ServiceConfig);
-
-            ProgressAction = progressAction;
-            CompleteAction = completeAction;
         }
 
         /// <summary>
         /// Gets the AWS configuration element used to build this instance's AWS service.
         /// </summary>
         protected AWSTargetConfigurationElement AWSConfig { get; private set; }
-
-        /// <summary>
-        /// Gets the action to call when the network activity is complete.
-        /// </summary>
-        public Action CompleteAction { get; protected set; }
-
-        /// <summary>
-        /// Gets the action to call for progress notifications.
-        /// Perceent complete is passed as the only parameter.
-        /// </summary>
-        public Action<int> ProgressAction { get; protected set; }
 
         /// <summary>
         /// Gets the AWS service.
@@ -76,7 +62,9 @@ namespace SThreeQL
         /// <summary>
         /// Executes the task.
         /// </summary>
+        /// <param name="stdOut">A text writer to write standard output messages to.</param>
+        /// <param name="stdError">A text writer to write standard error messages to.</param>
         /// <returns>The result of the execution.</returns>
-        public abstract TaskExecutionResult Execute();
+        public abstract TaskExecutionResult Execute(TextWriter stdOut, TextWriter stdError);
     }
 }

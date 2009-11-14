@@ -66,9 +66,14 @@
     <Compile Include="Configuration\DatabaseRestoreTargetConfigurationElementCollection.cs" />
     <Compile Include="Configuration\DatabaseTargetConfigurationElement.cs" />
     <Compile Include="Configuration\DatabaseTargetConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\ScheduleConfigurationElement.cs" />
+    <Compile Include="Configuration\ScheduleConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\ScheduleTargetConfigurationElement.cs" />
+    <Compile Include="Configuration\ScheduleTargetConfigurationElementCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestoreTask.cs" />
     <Compile Include="Configuration\SThreeQLConfiguration.cs" />
+    <Compile Include="ScheduleQueue.cs" />
     <Compile Include="TaskExecutionResult.cs" />
   </ItemGroup>
   <ItemGroup>

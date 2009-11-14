@@ -6,9 +6,11 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using Affirma.ThreeSharp;
 using Affirma.ThreeSharp.Query;
 using Affirma.ThreeSharp.Model;
+using Affirma.ThreeSharp.Statistics;
 using SThreeQL.Configuration;
 
 namespace SThreeQL
@@ -31,16 +33,7 @@ namespace SThreeQL
         /// </summary>
         /// <param name="config">The configuration element identifying the backup target to execute.</param>
         public BackupTask(DatabaseTargetConfigurationElement config)
-            : this(config, null, null) { }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="config">The configuration element identifying the backup target to execute.</param>
-        /// <param name="progressAction">The action to call for network progress notifications.</param>
-        /// <param name="completeAction">The action to call when the network activity is complete.</param>
-        public BackupTask(DatabaseTargetConfigurationElement config, Action<int> progressAction, Action completeAction)
-            : base(SThreeQLConfiguration.Section.AWSTargets[config.AWSBucketName], progressAction, completeAction)
+            : base(SThreeQLConfiguration.Section.AWSTargets[config.AWSBucketName]) 
         {
             Config = config;
         }
@@ -96,8 +89,12 @@ namespace SThreeQL
         /// <summary>
         /// Runs the backup script to create a fresh backup file.
         /// </summary>
-        private void BackupDatabase()
+        /// <param name="stdOut">A text writer to write standard output messages to.</param>
+        /// <param name="stdError">A text writer to write standard error messages to.</param>
+        private void BackupDatabase(TextWriter stdOut, TextWriter stdError)
         {
+            stdOut.WriteLine(String.Format("   Backing up catalog {0}.", Config.CatalogName));
+            
             if (File.Exists(TempPath))
             {
                 File.Delete(TempPath);
@@ -122,6 +119,7 @@ namespace SThreeQL
                         command.ExecuteNonQuery();
                     }
 
+                    stdOut.WriteLine("   Compressing the backup file.");
                     Common.CompressFile(TempPath);
                 }
                 finally
@@ -134,18 +132,26 @@ namespace SThreeQL
         /// <summary>
         /// Executes the task.
         /// </summary>
+        /// <param name="stdOut">A text writer to write standard output messages to.</param>
+        /// <param name="stdError">A text writer to write standard error messages to.</param>
         /// <returns>The result of the execution.</returns>
-        public override TaskExecutionResult Execute()
+        public override TaskExecutionResult Execute(TextWriter stdOut, TextWriter stdError)
         {
             TaskExecutionResult result = new TaskExecutionResult();
+            stdOut.WriteLine(String.Format("Executing backup target {0}:", Config.Name));
 
             try
             {
-                BackupDatabase();
-                UploadBackup();
+                BackupDatabase(stdOut, stdError);
+                UploadBackup(stdOut, stdError);
+
+                stdOut.WriteLine("   Backup complete.");
             }
             catch (Exception ex)
             {
+                stdError.WriteLine(String.Format("   Failed to execute backup task {0}:", Config.Name));
+                stdError.WriteLine("      " + ex.Message);
+                stdError.WriteLine("      " + ex.StackTrace);
                 result.Exception = ex;
                 result.Success = false;
             }
@@ -170,9 +176,12 @@ namespace SThreeQL
         /// <summary>
         /// Uploads the backup set to AWS.
         /// </summary>
-        private void UploadBackup()
+        /// <param name="stdOut">A text writer to write standard output messages to.</param>
+        /// <param name="stdError">A text writer to write standard error messages to.</param>
+        private void UploadBackup(TextWriter stdOut, TextWriter stdError)
         {
             string redirectUrl = Service.GetRedirectUrl(AWSConfig.BucketName, null);
+            stdOut.WriteLine("   Uploading the backup file (" + new FileInfo(TempPath).Length.ToFileSize() + "):");
 
             using (ObjectAddRequest request = new ObjectAddRequest(AWSConfig.BucketName, AWSKey))
             {
@@ -184,19 +193,47 @@ namespace SThreeQL
                     request.RedirectUrl = redirectUrl + AWSKey;
                 }
 
-                if (ProgressAction != null)
+                bool statusRunning = true;
+                ObjectAddResponse response = null;
+                DateTime start = DateTime.Now;
+
+                Thread statusThread = new Thread(new ThreadStart(delegate()
                 {
-                    request.Progress += new EventHandler<TransferInfoProgressEventArgs>(delegate(object sender, TransferInfoProgressEventArgs e)
+                    while (statusRunning)
                     {
-                        ProgressAction((int)((double)e.Info.BytesTransferred / e.Info.BytesTotal * 100));
-                    });
-                }
+                        try
+                        {
+                            TransferInfo info = Service.GetTransferInfo(request.ID);
+                            long transferred = info.BytesTransferred;
+                            int percent = (int)((double)transferred / request.BytesTotal * 100d);
 
-                using (ObjectAddResponse response = Service.ObjectAdd(request)) { }
+                            if (percent > 0)
+                            {
+                                TimeSpan duration = DateTime.Now.Subtract(start);
+                                double rate = (transferred / 1024) / duration.TotalSeconds;
+                                stdOut.WriteLine(String.Format("      {0:###}% uploaded ({1:N0} KB/S).", percent, rate));
 
-                if (CompleteAction != null)
+                                if (percent == 100)
+                                {
+                                    statusRunning = false;
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // The transfer hasn't started yet.
+                        }
+
+                        Thread.Sleep(1000);
+                    }
+                }));
+
+                statusThread.Start();
+
+                using (response = Service.ObjectAdd(request)) 
                 {
-                    CompleteAction();
+                    statusRunning = false;
+                    stdOut.WriteLine("      Upload complete.");
                 }
             }
         }

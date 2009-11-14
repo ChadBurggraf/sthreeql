@@ -251,6 +251,42 @@ namespace SThreeQL
         }
 
         /// <summary>
+        /// Converts a length of bytes to a friendly file size string.
+        /// </summary>
+        /// <param name="bytes">The bytes length to convert.</param>
+        /// <returns>A friendly file size string.</returns>
+        public static string ToFileSize(this long bytes)
+        {
+            const decimal KB = 1024;
+            const decimal MB = KB * 1024;
+            const decimal GB = MB * 1024;
+
+            decimal size = Convert.ToDecimal(bytes);
+            string suffix = " B";
+            string format = "N0";
+
+            if (bytes > GB)
+            {
+                size /= GB;
+                suffix = " GB";
+                format = "N2";
+            }
+            else if (bytes > MB)
+            {
+                size /= MB;
+                suffix = " MB";
+                format = "N1";
+            }
+            else if (bytes > KB)
+            {
+                size /= KB;
+                suffix = " KB";
+            }
+
+            return size.ToString(format) + suffix; 
+        }
+
+        /// <summary>
         /// Converts the given object to an integer and replaces it
         /// with the default value if it is null or 0.
         /// </summary>

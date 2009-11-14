@@ -7,10 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Xml;
 using Affirma.ThreeSharp;
-using Affirma.ThreeSharp.Query;
 using Affirma.ThreeSharp.Model;
+using Affirma.ThreeSharp.Query;
+using Affirma.ThreeSharp.Statistics;
 using SThreeQL.Configuration;
 
 namespace SThreeQL
@@ -33,16 +35,7 @@ namespace SThreeQL
         /// </summary>
         /// <param name="config">The configuration element identifying the backup target to execute.</param>
         public RestoreTask(DatabaseRestoreTargetConfigurationElement config)
-            : this(config, null, null) { }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="config">The configuration element identifying the restore target to execute.</param>
-        /// <param name="progressAction">The action to call for network progress notifications.</param>
-        /// <param name="completeAction">The action to call when the network activity is complete.</param>
-        public RestoreTask(DatabaseRestoreTargetConfigurationElement config, Action<int> progressAction, Action completeAction)
-            : base(SThreeQLConfiguration.Section.AWSTargets[config.AWSBucketName], progressAction, completeAction)
+            : base(SThreeQLConfiguration.Section.AWSTargets[config.AWSBucketName]) 
         {
             Config = config;
         }
@@ -97,8 +90,10 @@ namespace SThreeQL
 
         /// <summary>
         /// Downloads the latest backup set from the AWS service.
+        /// <param name="stdOut">A text writer to write standard output messages to.</param>
+        /// <param name="stdError">A text writer to write standard error messages to.</param>
         /// </summary>
-        protected void DownloadDatabase()
+        protected void DownloadDatabase(TextWriter stdOut, TextWriter stdError)
         {
             if (File.Exists(TempPath))
             {
@@ -107,6 +102,8 @@ namespace SThreeQL
 
             string redirectUrl = Service.GetRedirectUrl(AWSConfig.BucketName, AWSPrefix);
             BucketListResponseItem item = GetLatestBackupItem(redirectUrl);
+
+            stdOut.WriteLine("   Downloading the backup file (" + item.Size.ToFileSize() + "):");
 
             using (ObjectGetRequest request = new ObjectGetRequest(AWSConfig.BucketName, item.Key))
             {
@@ -117,23 +114,48 @@ namespace SThreeQL
 
                 using (ObjectGetResponse response = Service.ObjectGet(request))
                 {
-                    if (ProgressAction != null)
-                    {
-                        response.Progress += new EventHandler<TransferInfoProgressEventArgs>(delegate(object sender, TransferInfoProgressEventArgs e)
-                        {
-                            ProgressAction((int)((double)e.Info.BytesTransferred / item.Size * 100));
-                        });
-                    }
+                    bool statusRunning = true;
+                    DateTime start = DateTime.Now;
 
+                    Thread statusThread = new Thread(new ThreadStart(delegate()
+                    {
+                        while (statusRunning)
+                        {
+                            try
+                            {
+                                TransferInfo info = Service.GetTransferInfo(response.ID);
+                                long transferred = info.BytesTransferred;
+                                int percent = (int)((double)transferred / item.Size * 100d);
+
+                                if (percent > 0)
+                                {
+                                    TimeSpan duration = DateTime.Now.Subtract(start);
+                                    double rate = (transferred / 1024) / duration.TotalSeconds;
+                                    stdOut.WriteLine(String.Format("      {0:###}% downloaded ({1:N0} KB/S).", percent, rate));
+
+                                    if (percent == 100)
+                                    {
+                                        statusRunning = false;
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                // The transfer hasn't started yet.
+                            }
+
+                            Thread.Sleep(1000);
+                        }
+                    }));
+
+                    statusThread.Start();
                     response.StreamResponseToFile(TempPath);
+                    statusRunning = false;
+                    stdOut.WriteLine("      Download complete.");
                 }
             }
 
-            if (CompleteAction != null)
-            {
-                CompleteAction();
-            }
-
+            stdOut.WriteLine("   Decompressing the downloaded file.");
             Common.DecompressFile(TempPath);
         }
 
@@ -187,18 +209,26 @@ namespace SThreeQL
         /// <summary>
         /// Executes the task.
         /// </summary>
+        /// <param name="stdOut">A text writer to write standard output messages to.</param>
+        /// <param name="stdError">A text writer to write standard error messages to.</param>
         /// <returns>The result of the execution.</returns>
-        public override TaskExecutionResult Execute()
+        public override TaskExecutionResult Execute(TextWriter stdOut, TextWriter stdError)
         {
             TaskExecutionResult result = new TaskExecutionResult();
+            stdOut.WriteLine(String.Format("Executing restore target {0}:", Config.Name));
 
             try
             {
-                DownloadDatabase();
-                RestoreDatabase();
+                DownloadDatabase(stdOut, stdError);
+                RestoreDatabase(stdOut, stdError);
+
+                stdOut.WriteLine("   Restore complete.");
             }
             catch (Exception ex)
             {
+                stdError.WriteLine(String.Format("   Failed to execute restore task {0}:", Config.Name));
+                stdError.WriteLine("      " + ex.Message);
+                stdError.WriteLine("      " + ex.StackTrace);
                 result.Exception = ex;
                 result.Success = false;
             }
@@ -223,9 +253,12 @@ namespace SThreeQL
         /// <summary>
         /// Runs the restore script on the downloaded backup set.
         /// </summary>
-        private void RestoreDatabase()
+        /// <param name="stdOut">A text writer to write standard output messages to.</param>
+        /// <param name="stdError">A text writer to write standard error messages to.</param>
+        private void RestoreDatabase(TextWriter stdOut, TextWriter stdError)
         {
             string connectionString = Common.CreateConnectionString(Config);
+            stdOut.WriteLine(String.Format("   Dropping catalog {0} if it exists.", Config.RestoreCatalogName));
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -256,6 +289,8 @@ namespace SThreeQL
             {
                 Directory.CreateDirectory(Config.RestorePath);
             }
+
+            stdOut.WriteLine(String.Format("   Restoring catalog {0}.", Config.RestoreCatalogName));
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -298,19 +333,9 @@ namespace SThreeQL
                             command.Parameters.Add(new SqlParameter("@FilePath" + i, path));
 
                             sb.Append(String.Concat("\tMOVE @FileName", i, " TO @FilePath", i, ",\n"));
-
-                            if (File.Exists(path))
-                            {
-                                File.Delete(path);
-                            }
-                            else if (Directory.Exists(path))
-                            {
-                                Directory.Delete(path, true);
-                            }
                         }
 
                         command.CommandText = String.Format(Common.GetEmbeddedResourceText("SThreeQL.Restore.sql"), sb.ToString());
-
                         command.ExecuteNonQuery();
                     }
                 }
