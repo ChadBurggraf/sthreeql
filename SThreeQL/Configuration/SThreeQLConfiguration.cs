@@ -48,6 +48,15 @@ namespace SThreeQL.Configuration
         }
 
         /// <summary>
+        /// Gets the collection of schedules.
+        /// </summary>
+        [ConfigurationProperty("schedules")]
+        public ScheduleConfigurationElementCollection Schedules
+        {
+            get { return (ScheduleConfigurationElementCollection)(this["schedules"] ?? new ScheduleConfigurationElementCollection()); }
+        }
+
+        /// <summary>
         /// Gets a reference to the section from the configuration.
         /// </summary>
         public static SThreeQLConfiguration Section

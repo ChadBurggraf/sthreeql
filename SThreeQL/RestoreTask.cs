@@ -115,10 +115,12 @@ namespace SThreeQL
                 using (ObjectGetResponse response = Service.ObjectGet(request))
                 {
                     bool statusRunning = true;
-                    DateTime start = DateTime.Now;
-
+                    
                     Thread statusThread = new Thread(new ThreadStart(delegate()
                     {
+                        DateTime lastTime = DateTime.Now;
+                        long lastTransferred = 0;
+
                         while (statusRunning)
                         {
                             try
@@ -129,9 +131,12 @@ namespace SThreeQL
 
                                 if (percent > 0)
                                 {
-                                    TimeSpan duration = DateTime.Now.Subtract(start);
-                                    double rate = (transferred / 1024) / duration.TotalSeconds;
+                                    TimeSpan duration = DateTime.Now.Subtract(lastTime);
+                                    double rate = ((transferred - lastTransferred) / 1024) / duration.TotalSeconds;
                                     stdOut.WriteLine(String.Format("      {0:###}% downloaded ({1:N0} KB/S).", percent, rate));
+
+                                    lastTime = DateTime.Now;
+                                    lastTransferred = transferred;
 
                                     if (percent == 100)
                                     {

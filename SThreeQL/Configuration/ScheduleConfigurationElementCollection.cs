@@ -12,13 +12,22 @@ namespace SThreeQL.Configuration
     public class ScheduleConfigurationElementCollection : ConfigurationElementCollection
     {
         /// <summary>
-        /// Gets an element by its name.
+        /// Gets or sets an element by its name.
         /// </summary>
         /// <param name="bucketName">The name of the element to get.</param>
         /// <returns>An element.</returns>
         public new ScheduleConfigurationElement this[string name]
         {
             get { return (ScheduleConfigurationElement)BaseGet(name); }
+        }
+
+        /// <summary>
+        /// Adds an element to the end of the collection.
+        /// </summary>
+        /// <param name="element">The element to add.</param>
+        public void Add(ScheduleConfigurationElement element)
+        {
+            BaseAdd(element);
         }
 
         /// <summary>

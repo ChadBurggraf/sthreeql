@@ -12,48 +12,53 @@ namespace SThreeQL.Configuration
     public class ScheduleConfigurationElement : ConfigurationElement
     {
         /// <summary>
-        /// Gets the schedule's backup targets collection.
+        /// Gets or sets the schedule's backup targets collection.
         /// </summary>
         [ConfigurationProperty("backupTargets")]
         public ScheduleTargetConfigurationElementCollection BackupTagets
         {
-            get { return (ScheduleTargetConfigurationElementCollection)(this["backupTargets"] ?? new ScheduleTargetConfigurationElementCollection()); }
+            get { return (ScheduleTargetConfigurationElementCollection)(this["backupTargets"] ?? (this["backupTargets"] = new ScheduleTargetConfigurationElementCollection())); }
+            set { this["backupTargets"] = value; }
         }
 
         /// <summary>
-        /// Gets the name of the schedule.
+        /// Gets or sets the name of the schedule.
         /// </summary>
         [ConfigurationProperty("name", IsRequired = true, IsKey = true)]
         public string Name
         {
             get { return (string)this["name"]; }
+            set { this["name"] = value; }
         }
 
         /// <summary>
-        /// Gets the schedule's repeat type.
+        /// Gets or sets the schedule's repeat type.
         /// </summary>
         [ConfigurationProperty("repeat", IsRequired = true)]
         public ScheduleRepeatType Repeat
         {
             get { return (ScheduleRepeatType)this["repeat"]; }
+            set { this["repeat"] = value; }
         }
 
         /// <summary>
-        /// Gets the schedule's restore targets collection.
+        /// Gets or sets the schedule's restore targets collection.
         /// </summary>
         [ConfigurationProperty("restoreTargets")]
         public ScheduleTargetConfigurationElementCollection RestoreTargets
         {
-            get { return (ScheduleTargetConfigurationElementCollection)(this["restoreTargets"] ?? new ScheduleTargetConfigurationElementCollection()); }
+            get { return (ScheduleTargetConfigurationElementCollection)(this["restoreTargets"] ?? (this["restoreTargets"] = new ScheduleTargetConfigurationElementCollection())); }
+            set { this["restoreTargets"] = value; }
         }
 
         /// <summary>
-        /// Gets the schedule's start date and time.
+        /// Gets or sets the schedule's start date and time.
         /// </summary>
         [ConfigurationProperty("startDate", IsRequired = true)]
         public DateTime StartDate
         {
             get { return (DateTime)this["startDate"]; }
+            set { this["startDate"] = value; }
         }
     }
 
