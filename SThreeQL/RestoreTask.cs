@@ -75,7 +75,7 @@ namespace SThreeQL
                 if (tempPath == null)
                 {
                     tempPath = Path.Combine(
-                        SThreeQLConfiguration.Section.RestoreTargets.TempDir,
+                        !String.IsNullOrEmpty(SThreeQLConfiguration.Section.RestoreTargets.TempDir) ? SThreeQLConfiguration.Section.RestoreTargets.TempDir : Path.GetTempPath(),
                         Path.GetRandomFileName()
                     );
                 }
