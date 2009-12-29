@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
-using Affirma.ThreeSharp;
-using Affirma.ThreeSharp.Model;
-using Affirma.ThreeSharp.Query;
-using Affirma.ThreeSharp.Statistics;
+using System.Text.RegularExpressions;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
 using SThreeQL.Configuration;
 
 namespace SThreeQL
@@ -14,8 +15,11 @@ namespace SThreeQL
     /// <summary>
     /// Abstract task for tasks needing an AWS service.
     /// </summary>
-    public abstract class AWSTask
+    public abstract class AWSTask : Task, ITransferDelegate
     {
+        private static readonly object locker = new object();
+        private ITransferDelegate transferDelegate;
+
         /// <summary>
         /// Gets the number of seconds to use for SQL connection timeouts.
         /// </summary>
@@ -34,14 +38,12 @@ namespace SThreeQL
 
             AWSConfig = awsConfig;
 
-            ServiceConfig = new ThreeSharpConfig();
-            ServiceConfig.AwsAccessKeyID = AWSConfig.AWSAccessKeyId;
-            ServiceConfig.AwsSecretAccessKey = AWSConfig.AWSSecretAccessKeyId;
-            ServiceConfig.ConnectionLimit = 40;
-            ServiceConfig.IsSecure = SThreeQLConfiguration.Section.UseSSL;
-            ServiceConfig.Format = CallingFormat.SUBDOMAIN;
+            AmazonS3Config s3Config = new AmazonS3Config()
+            {
+                CommunicationProtocol = SThreeQLConfiguration.Section.UseSSL ? Protocol.HTTPS : Protocol.HTTP
+            };
 
-            Service = new ThreeSharpQuery(ServiceConfig);
+            S3Client = AWSClientFactory.CreateAmazonS3Client(awsConfig.AWSAccessKeyId, awsConfig.AWSSecretAccessKeyId, s3Config);
         }
 
         /// <summary>
@@ -50,21 +52,56 @@ namespace SThreeQL
         protected AWSTargetConfigurationElement AWSConfig { get; private set; }
 
         /// <summary>
-        /// Gets the AWS service.
+        /// Gets the AWS S3 client;
         /// </summary>
-        protected IThreeSharp Service { get; private set; }
+        protected AmazonS3 S3Client { get; private set; }
 
         /// <summary>
-        /// Gets the AWS service configuration.
+        /// Gets or sets the transfer delegate.
         /// </summary>
-        protected ThreeSharpConfig ServiceConfig { get; private set; }
+        public ITransferDelegate TransferDelegate
+        {
+            get
+            {
+                lock (locker)
+                {
+                    if (transferDelegate == null)
+                    {
+                        transferDelegate = this;
+                    }
+
+                    return transferDelegate;
+                }
+            }
+            set
+            {
+                lock (locker)
+                {
+                    transferDelegate = value;
+                }
+            }
+        }
+
+        #region ITransferDelegate Members
 
         /// <summary>
-        /// Executes the task.
+        /// Called when a transfer is complete.
         /// </summary>
-        /// <param name="stdOut">A text writer to write standard output messages to.</param>
-        /// <param name="stdError">A text writer to write standard error messages to.</param>
-        /// <returns>The result of the execution.</returns>
-        public abstract TaskExecutionResult Execute(TextWriter stdOut, TextWriter stdError);
+        /// <param name="info">The transfer's meta data.</param>
+        public void OnTransferComplete(TransferInfo info) { }
+
+        /// <summary>
+        /// Called when a transfer's progress has been updated..
+        /// </summary>
+        /// <param name="info">The transfer's meta data.</param>
+        public void OnTransferProgress(TransferInfo info) { }
+
+        /// <summary>
+        /// Called when a transfer begins.
+        /// </summary>
+        /// <param name="info">The transfer's meta data.</param>
+        public void OnTransferStart(TransferInfo info) { }
+
+        #endregion
     }
 }

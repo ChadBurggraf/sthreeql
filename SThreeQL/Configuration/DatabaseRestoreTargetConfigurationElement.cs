@@ -13,7 +13,7 @@ namespace SThreeQL.Configuration
     {
         /// <summary>
         /// Gets the target's restore catalog name.
-        /// Defaults to the value of <see cref="CatalogName"/> when empty.
+        /// Defaults to the value of <see cref="DatabaseTargetConfigurationElement.CatalogName"/> when empty.
         /// </summary>
         [ConfigurationProperty("restoreCatalogName", IsRequired = false)]
         public string RestoreCatalogName

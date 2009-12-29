@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Xml;
-using Affirma.ThreeSharp;
-using Affirma.ThreeSharp.Model;
-using Affirma.ThreeSharp.Query;
-using Affirma.ThreeSharp.Statistics;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
 using SThreeQL.Configuration;
 
 namespace SThreeQL
@@ -20,11 +20,13 @@ namespace SThreeQL
     /// <summary>
     /// Represents a task for executing the restore procedure on a restore target.
     /// </summary>
-    public class RestoreTask : AWSTask
+    public class RestoreTask : AWSTask, IRestoreDelegate
     {
         #region Member Variables
 
-        private string awsPrefix, tempPath;
+        private static readonly object locker = new object();
+        private string awsPrefix;
+        private IRestoreDelegate restoreDelegate;
 
         #endregion
 
@@ -33,11 +35,11 @@ namespace SThreeQL
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="config">The configuration element identifying the backup target to execute.</param>
-        public RestoreTask(DatabaseRestoreTargetConfigurationElement config)
-            : base(SThreeQLConfiguration.Section.AWSTargets[config.AWSBucketName]) 
+        /// <param name="target">The restore target to execute.</param>
+        public RestoreTask(DatabaseRestoreTargetConfigurationElement target)
+            : base(SThreeQLConfiguration.Section.AWSTargets[target.AWSBucketName]) 
         {
-            Config = config;
+            Target = target;
         }
 
         #endregion
@@ -53,7 +55,7 @@ namespace SThreeQL
             {
                 if (awsPrefix == null)
                 {
-                    awsPrefix = Config.CatalogName.ToCatalogNamePrefix();
+                    awsPrefix = EscapeCatalogName(Target.CatalogName);
                 }
 
                 return awsPrefix;
@@ -61,28 +63,35 @@ namespace SThreeQL
         }
 
         /// <summary>
-        /// Gets the configuration element identifying the restore target to execute.
+        /// Gets or sets the restore delegate.
         /// </summary>
-        public DatabaseRestoreTargetConfigurationElement Config { get; protected set; }
-
-        /// <summary>
-        /// Gets the fully qualified temporary file path.
-        /// </summary>
-        private string TempPath
+        public IRestoreDelegate RestoreDelegate
         {
             get
             {
-                if (tempPath == null)
+                lock (locker)
                 {
-                    tempPath = Path.Combine(
-                        !String.IsNullOrEmpty(SThreeQLConfiguration.Section.RestoreTargets.TempDir) ? SThreeQLConfiguration.Section.RestoreTargets.TempDir : Path.GetTempPath(),
-                        Path.GetRandomFileName()
-                    );
-                }
+                    if (restoreDelegate == null)
+                    {
+                        restoreDelegate = this;
+                    }
 
-                return tempPath;
+                    return restoreDelegate;
+                }
+            }
+            set
+            {
+                lock (locker)
+                {
+                    restoreDelegate = value;
+                }
             }
         }
+
+        /// <summary>
+        /// Gets the restore target to execute.
+        /// </summary>
+        public DatabaseRestoreTargetConfigurationElement Target { get; protected set; }
 
         #endregion
 
@@ -90,150 +99,127 @@ namespace SThreeQL
 
         /// <summary>
         /// Downloads the latest backup set from the AWS service.
-        /// <param name="stdOut">A text writer to write standard output messages to.</param>
-        /// <param name="stdError">A text writer to write standard error messages to.</param>
         /// </summary>
-        protected void DownloadDatabase(TextWriter stdOut, TextWriter stdError)
+        /// <returns>The path to the downloaded and decompressed backup file.</returns>
+        public string DownloadBackup()
         {
-            if (File.Exists(TempPath))
+            return DownloadBackup(new ZlibCompressor());
+        }
+
+        /// <summary>
+        /// Downloads the latest backup set from the AWS service.
+        /// </summary>
+        /// <param name="compressor">The compresor to use when decompressing the downloaded file.</param>
+        /// <returns>The path to the downloaded and decompressed backup file.</returns>
+        public string DownloadBackup(ICompressor compressor)
+        {
+            S3Object latest = GetLatestBackupItem();
+            string path = Path.Combine(TempDir, latest.Key);
+            string fileName = Path.GetFileName(path);
+
+            if (File.Exists(path))
             {
-                File.Delete(TempPath);
+                File.Delete(path);
             }
 
-            string redirectUrl = Service.GetRedirectUrl(AWSConfig.BucketName, AWSPrefix);
-            BucketListResponseItem item = GetLatestBackupItem(redirectUrl);
+            GetObjectRequest request = new GetObjectRequest()
+                .WithBucketName(AWSConfig.BucketName)
+                .WithKey(latest.Key);
 
-            stdOut.WriteLine("   Downloading the backup file (" + item.Size.ToFileSize() + "):");
-
-            using (ObjectGetRequest request = new ObjectGetRequest(AWSConfig.BucketName, item.Key))
+            TransferInfo info = new TransferInfo()
             {
-                if (!String.IsNullOrEmpty(redirectUrl))
-                {
-                    request.RedirectUrl = redirectUrl + item.Key;
-                }
+                BytesTransferred = 0,
+                FileName = fileName,
+                FileSize = 0,
+                Target = Target
+            };
 
-                using (ObjectGetResponse response = Service.ObjectGet(request))
+            TransferDelegate.OnTransferStart(info);
+
+            using (FileStream file = File.Create(path))
+            {
+                using (GetObjectResponse response = S3Client.GetObject(request))
                 {
-                    bool statusRunning = true;
-                    
-                    Thread statusThread = new Thread(new ThreadStart(delegate()
+                    byte[] buffer = new byte[4096];
+                    int count = 0;
+
+                    while (0 < (count = response.ResponseStream.Read(buffer, 0, buffer.Length)))
                     {
-                        DateTime lastTime = DateTime.Now;
-                        long lastTransferred = 0;
+                        info.BytesTransferred += count;
+                        info.FileSize = response.ContentLength;
+                        file.Write(buffer, 0, count);
 
-                        while (statusRunning)
-                        {
-                            try
-                            {
-                                TransferInfo info = Service.GetTransferInfo(response.ID);
-                                long transferred = info.BytesTransferred;
-                                int percent = (int)((double)transferred / item.Size * 100d);
-
-                                if (percent > 0)
-                                {
-                                    TimeSpan duration = DateTime.Now.Subtract(lastTime);
-                                    double rate = ((transferred - lastTransferred) / 1024) / duration.TotalSeconds;
-                                    stdOut.WriteLine(String.Format("      {0:###}% downloaded ({1:N0} KB/S).", percent, rate));
-
-                                    lastTime = DateTime.Now;
-                                    lastTransferred = transferred;
-
-                                    if (percent == 100)
-                                    {
-                                        statusRunning = false;
-                                    }
-                                }
-                            }
-                            catch
-                            {
-                                // The transfer hasn't started yet.
-                            }
-
-                            Thread.Sleep(1000);
-                        }
-                    }));
-
-                    statusThread.Start();
-                    response.StreamResponseToFile(TempPath);
-                    statusRunning = false;
-                    stdOut.WriteLine("      Download complete.");
+                        TransferDelegate.OnTransferProgress(info);
+                    }
                 }
             }
 
-            stdOut.WriteLine("   Decompressing the downloaded file.");
-            Common.DecompressFile(TempPath);
+            TransferDelegate.OnTransferComplete(info);
+
+            RestoreDelegate.OnDeompressStart(Target);
+            string decompressedPath = compressor.Decompress(path);
+            RestoreDelegate.OnDecompressComplete(Target);
+
+            File.Delete(path);
+
+            return decompressedPath;
         }
 
         /// <summary>
         /// Gets the latest backup set item by last modified date.
         /// </summary>
-        /// <param name="redirectUrl">The redirect URL to use if the service is currently redirecting the bucket.</param>
         /// <returns>The latest backup set.</returns>
-        private BucketListResponseItem GetLatestBackupItem(string redirectUrl)
+        private S3Object GetLatestBackupItem()
         {
-            List<BucketListResponseItem> items = new List<BucketListResponseItem>();
+            List<S3Object> objects = new List<S3Object>();
             string marker = String.Empty;
             bool truncated = true;
 
             while (truncated)
             {
-                using (BucketListRequest request = new BucketListRequest(AWSConfig.BucketName, AWSPrefix))
+                ListObjectsRequest request = new ListObjectsRequest()
+                    .WithBucketName(AWSConfig.BucketName)
+                    .WithPrefix(AWSPrefix)
+                    .WithMarker(marker);
+
+                using (ListObjectsResponse response = S3Client.ListObjects(request))
                 {
-                    if (!String.IsNullOrEmpty(redirectUrl))
+                    objects.AddRange(response.S3Objects);
+
+                    if (response.IsTruncated)
                     {
-                        request.RedirectUrl = redirectUrl;
+                        marker = objects[objects.Count - 1].Key;
                     }
-
-                    if (!String.IsNullOrEmpty(marker))
+                    else
                     {
-                        request.QueryList.Add("marker", marker);
-                    }
-
-                    using (BucketListResponse response = Service.BucketList(request))
-                    {
-                        XmlDocument doc = response.StreamResponseToXmlDocument();
-
-                        foreach (XmlNode node in doc.SelectNodes("//*[local-name()='Contents']"))
-                        {
-                            items.Add(BucketListResponseItem.Create(node));
-                        }
-
-                        truncated = Boolean.Parse(doc.SelectSingleNode("//*[local-name()='IsTruncated']").InnerXml);
+                        truncated = false;
                     }
                 }
             }
 
-            if (items.Count == 0)
+            if (objects.Count == 0)
             {
-                throw new InvalidOperationException(String.Concat("There was no backup set found for catalog \"", Config.CatalogName, "\"."));
+                throw new InvalidOperationException(String.Concat("There was no backup set found for catalog \"", Target.CatalogName, "\"."));
             }
 
-            return items.OrderByDescending(i => i.LastModified).First();
+            return objects.OrderByDescending(o => o.LastModified).First();
         }
 
         /// <summary>
         /// Executes the task.
         /// </summary>
-        /// <param name="stdOut">A text writer to write standard output messages to.</param>
-        /// <param name="stdError">A text writer to write standard error messages to.</param>
         /// <returns>The result of the execution.</returns>
-        public override TaskExecutionResult Execute(TextWriter stdOut, TextWriter stdError)
+        public override TaskExecutionResult Execute()
         {
-            TaskExecutionResult result = new TaskExecutionResult();
-            stdOut.WriteLine(String.Format("Executing restore target {0}:", Config.Name));
+            TaskExecutionResult result = new TaskExecutionResult() { Target = Target };
+            string path = String.Empty;
 
             try
             {
-                DownloadDatabase(stdOut, stdError);
-                RestoreDatabase(stdOut, stdError);
-
-                stdOut.WriteLine("   Restore complete.");
+                RestoreDatabase(DownloadBackup());
             }
             catch (Exception ex)
             {
-                stdError.WriteLine(String.Format("   Failed to execute restore task {0}:", Config.Name));
-                stdError.WriteLine("      " + ex.Message);
-                stdError.WriteLine("      " + ex.StackTrace);
                 result.Exception = ex;
                 result.Success = false;
             }
@@ -241,15 +227,12 @@ namespace SThreeQL
             {
                 try
                 {
-                    if (File.Exists(TempPath))
+                    if (File.Exists(path))
                     {
-                        File.Delete(TempPath);
+                        File.Delete(path);
                     }
                 }
-                catch
-                {
-                    // Eat it.
-                }
+                catch { }
             }
 
             return result;
@@ -258,12 +241,11 @@ namespace SThreeQL
         /// <summary>
         /// Runs the restore script on the downloaded backup set.
         /// </summary>
-        /// <param name="stdOut">A text writer to write standard output messages to.</param>
-        /// <param name="stdError">A text writer to write standard error messages to.</param>
-        private void RestoreDatabase(TextWriter stdOut, TextWriter stdError)
+        /// <param name="path">The path of the backup file to restore.</param>
+        public void RestoreDatabase(string path)
         {
-            string connectionString = Common.CreateConnectionString(Config);
-            stdOut.WriteLine(String.Format("   Dropping catalog {0} if it exists.", Config.RestoreCatalogName));
+            string connectionString = Target.ConnectionString;
+            RestoreDelegate.OnRestoreStart(Target);
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -276,8 +258,8 @@ namespace SThreeQL
                         command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
                         command.CommandText = String.Format(
-                            Common.GetEmbeddedResourceText("SThreeQL.Drop.sql"),
-                            Config.RestoreCatalogName);
+                            new SqlScript("Drop.sql").Text,
+                            Target.RestoreCatalogName);
 
                         command.ExecuteNonQuery();
                     }
@@ -290,12 +272,10 @@ namespace SThreeQL
 
             SqlConnection.ClearAllPools();
 
-            if (!Directory.Exists(Config.RestorePath))
+            if (!Directory.Exists(Target.RestorePath))
             {
-                Directory.CreateDirectory(Config.RestorePath);
+                Directory.CreateDirectory(Target.RestorePath);
             }
-
-            stdOut.WriteLine(String.Format("   Restoring catalog {0}.", Config.RestoreCatalogName));
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -309,9 +289,9 @@ namespace SThreeQL
                     {
                         command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
-                        command.CommandText = Common.GetEmbeddedResourceText("SThreeQL.GetFiles.sql");
+                        command.CommandText = new SqlScript("GetFiles.sql").Text;
 
-                        command.Parameters.Add(new SqlParameter("@Path", TempPath));
+                        command.Parameters.Add(new SqlParameter("@Path", path));
 
                         using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                         {
@@ -324,23 +304,23 @@ namespace SThreeQL
                         command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
 
-                        command.Parameters.Add(new SqlParameter("@RestoreCatalog", Config.RestoreCatalogName));
-                        command.Parameters.Add(new SqlParameter("@Path", TempPath));
+                        command.Parameters.Add(new SqlParameter("@RestoreCatalog", Target.RestoreCatalogName));
+                        command.Parameters.Add(new SqlParameter("@Path", path));
 
                         StringBuilder sb = new StringBuilder();
 
                         for (int i = 0; i < files.Rows.Count; i++)
                         {
-                            string name = files.Rows[i]["LogicalName"].ToString();
-                            string path = Path.Combine(Config.RestorePath, Path.GetFileName(files.Rows[i]["PhysicalName"].ToString()));
+                            string fileName = files.Rows[i]["LogicalName"].ToString();
+                            string filePath = Path.Combine(Target.RestorePath, Path.GetFileName(files.Rows[i]["PhysicalName"].ToString()));
 
-                            command.Parameters.Add(new SqlParameter("@FileName" + i, name));
-                            command.Parameters.Add(new SqlParameter("@FilePath" + i, path));
+                            command.Parameters.Add(new SqlParameter("@FileName" + i, fileName));
+                            command.Parameters.Add(new SqlParameter("@FilePath" + i, filePath));
 
                             sb.Append(String.Concat("\tMOVE @FileName", i, " TO @FilePath", i, ",\n"));
                         }
 
-                        command.CommandText = String.Format(Common.GetEmbeddedResourceText("SThreeQL.Restore.sql"), sb.ToString());
+                        command.CommandText = String.Format(new SqlScript("Restore.sql").Text, sb.ToString());
                         command.ExecuteNonQuery();
                     }
                 }
@@ -349,7 +329,37 @@ namespace SThreeQL
                     connection.Close();
                 }
             }
+
+            RestoreDelegate.OnRestoreComplete(Target);
         }
+
+        #endregion
+
+        #region IRestoreDelegate Members
+
+        /// <summary>
+        /// Called when a database restore is complete.
+        /// </summary>
+        /// <param name="target">The restore's target.</param>
+        public void OnRestoreComplete(DatabaseRestoreTargetConfigurationElement target) { }
+
+        /// <summary>
+        /// Called when a database restore begins.
+        /// </summary>
+        /// <param name="target">The restore's target.</param>
+        public void OnRestoreStart(DatabaseRestoreTargetConfigurationElement target) { }
+
+        /// <summary>
+        /// Called when a database backup file has been decompressed.
+        /// </summary>
+        /// <param name="target">The restore's target.</param>
+        public void OnDecompressComplete(DatabaseRestoreTargetConfigurationElement target) { }
+
+        /// <summary>
+        /// Called when a database backup file is about to be decompressed.
+        /// </summary>
+        /// <param name="target">The restore's target.</param>
+        public void OnDeompressStart(DatabaseRestoreTargetConfigurationElement target) { }
 
         #endregion
     }

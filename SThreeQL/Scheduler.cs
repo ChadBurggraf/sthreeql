@@ -163,7 +163,7 @@ namespace SThreeQL
                 try
                 {
                     DatabaseTargetConfigurationElement config = SThreeQLConfiguration.Section.BackupTargets[target.Name];
-                    new BackupTask(config).Execute(stdOut, stdError);
+                    new BackupTask(config).Execute();
                 }
                 catch (Exception ex)
                 {
@@ -178,7 +178,7 @@ namespace SThreeQL
                 try
                 {
                     DatabaseRestoreTargetConfigurationElement config = SThreeQLConfiguration.Section.RestoreTargets[target.Name];
-                    new RestoreTask(config).Execute(stdOut, stdError);
+                    new RestoreTask(config).Execute();
                 }
                 catch (Exception ex)
                 {
@@ -246,8 +246,8 @@ namespace SThreeQL
         /// <summary>
         /// Gets the next execution date for the given schedule.
         /// </summary>
-        /// <param name="schedule"></param>
-        /// <returns></returns>
+        /// <param name="schedule">The schedule to get the next execution date for.</param>
+        /// <returns>The schedule's next execution date.</returns>
         public static DateTime GetNextExecuteDate(ScheduleConfigurationElement schedule)
         {
             if (DateTime.Now < schedule.StartDate)
@@ -259,7 +259,7 @@ namespace SThreeQL
             // TODO: The only repeat type is Daily right now.
             //
 
-            int days = (int)Math.Ceiling(DateTime.Now.Subtract(schedule.StartDate).TotalDays);
+            int days = (int)Math.Floor(DateTime.Now.Subtract(schedule.StartDate).TotalDays);
             return schedule.StartDate.AddDays(days);
         }
 

@@ -7,10 +7,9 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
-using Affirma.ThreeSharp;
-using Affirma.ThreeSharp.Query;
-using Affirma.ThreeSharp.Model;
-using Affirma.ThreeSharp.Statistics;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
 using SThreeQL.Configuration;
 
 namespace SThreeQL
@@ -18,11 +17,13 @@ namespace SThreeQL
     /// <summary>
     /// Represents a task for executing the backup procedure on a backup target.
     /// </summary>
-    public class BackupTask : AWSTask
+    public class BackupTask : AWSTask, IBackupDelegate
     {
         #region Member Variables
 
-        private string awsKey, tempPath;
+        private static readonly object locker = new object();
+        private string backupFileName;
+        private IBackupDelegate backupDelegate;
 
         #endregion
 
@@ -31,11 +32,11 @@ namespace SThreeQL
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="config">The configuration element identifying the backup target to execute.</param>
-        public BackupTask(DatabaseTargetConfigurationElement config)
-            : base(SThreeQLConfiguration.Section.AWSTargets[config.AWSBucketName]) 
+        /// <param name="target">The backup target to execute.</param>
+        public BackupTask(DatabaseTargetConfigurationElement target)
+            : base(SThreeQLConfiguration.Section.AWSTargets[target.AWSBucketName]) 
         {
-            Config = config;
+            Target = target;
         }
 
         #endregion
@@ -43,44 +44,56 @@ namespace SThreeQL
         #region Properties
 
         /// <summary>
-        /// Gets the generated AWS key to use for the backup.
+        /// Gets or sets the backup delegate.
         /// </summary>
-        private string AWSKey
+        public IBackupDelegate BackupDelegate
         {
             get
             {
-                if (awsKey == null)
+                lock (locker)
                 {
-                    awsKey = Config.CatalogName.ToCatalogNameAWSKey();
+                    if (backupDelegate == null)
+                    {
+                        backupDelegate = this;
+                    }
+
+                    return backupDelegate;
+                }
+            }
+            set
+            {
+                lock (locker)
+                {
+                    backupDelegate = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the name to use for the backup file.
+        /// </summary>
+        protected string BackupFileName
+        {
+            get
+            {
+                if (backupFileName == null)
+                {
+                    backupFileName = String.Concat(
+                        EscapeCatalogName(Target.CatalogName),
+                        "_",
+                        DateTime.Now.ToISO8601UTCPathSafeString(),
+                        ".bak"
+                    );
                 }
 
-                return awsKey;
+                return backupFileName;
             }
         }
 
         /// <summary>
         /// Gets the configuration element identifying the backup target to execute.
         /// </summary>
-        public DatabaseTargetConfigurationElement Config { get; protected set; }
-
-        /// <summary>
-        /// Gets the fully qualified temporary file path.
-        /// </summary>
-        private string TempPath
-        {
-            get
-            {
-                if (tempPath == null)
-                {
-                    tempPath = Path.Combine(
-                        !String.IsNullOrEmpty(SThreeQLConfiguration.Section.BackupTargets.TempDir) ? SThreeQLConfiguration.Section.BackupTargets.TempDir : Path.GetTempPath(), 
-                        Path.GetRandomFileName()
-                    );
-                }
-
-                return tempPath;
-            }
-        }
+        public DatabaseTargetConfigurationElement Target { get; protected set; }
 
         #endregion
 
@@ -89,38 +102,59 @@ namespace SThreeQL
         /// <summary>
         /// Runs the backup script to create a fresh backup file.
         /// </summary>
-        /// <param name="stdOut">A text writer to write standard output messages to.</param>
-        /// <param name="stdError">A text writer to write standard error messages to.</param>
-        private void BackupDatabase(TextWriter stdOut, TextWriter stdError)
+        /// <returns>The path to the compressed backup file.</returns>
+        public string BackupDatabase()
         {
-            stdOut.WriteLine(String.Format("   Backing up catalog {0}.", Config.CatalogName));
-            
-            if (File.Exists(TempPath))
-            {
-                File.Delete(TempPath);
-            }
+            return BackupDatabase(new ZlibCompressor());
+        }
 
-            using (SqlConnection connection = new SqlConnection(Common.CreateConnectionString(Config)))
+        /// <summary>
+        /// Runs the backup script to create a fresh backup file.
+        /// </summary>
+        /// <param name="compressor">The compressor to use when compressing the backup file.</param>
+        /// <returns>The path to the compressed backup file.</returns>
+        public string BackupDatabase(ICompressor compressor)
+        {
+            string path = Path.Combine(TempDir, Path.GetRandomFileName());
+
+            using (SqlConnection connection = new SqlConnection(Target.ConnectionString))
             {
                 connection.Open();
 
                 try
                 {
+                    BackupDelegate.OnBackupStart(Target);
+
                     using (SqlCommand command = connection.CreateCommand())
                     {
                         command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
-                        command.CommandText = Common.GetEmbeddedResourceText("SThreeQL.Backup.sql");
+                        command.CommandText = new SqlScript("Backup.sql").Text;
 
-                        command.Parameters.Add(new SqlParameter("@Catalog", Config.CatalogName));
-                        command.Parameters.Add(new SqlParameter("@Path", TempPath));
-                        command.Parameters.Add(new SqlParameter("@Name", Config.CatalogName + " - Full Database Backup"));
+                        command.Parameters.Add(new SqlParameter("@Catalog", Target.CatalogName));
+                        command.Parameters.Add(new SqlParameter("@Path", path));
+                        command.Parameters.Add(new SqlParameter("@Name", Target.CatalogName + " - Full Database Backup"));
 
                         command.ExecuteNonQuery();
                     }
 
-                    stdOut.WriteLine("   Compressing the backup file.");
-                    Common.CompressFile(TempPath);
+                    BackupDelegate.OnBackupComplete(Target);
+
+                    string namedPath = Path.Combine(TempDir, BackupFileName);
+
+                    if (File.Exists(namedPath))
+                    {
+                        File.Delete(namedPath);
+                    }
+
+                    File.Move(path, namedPath);
+
+                    BackupDelegate.OnCompressStart(Target);
+                    string compressedPath = compressor.Compress(namedPath);
+                    BackupDelegate.OnCompressComplete(Target);
+
+                    File.Delete(namedPath);
+                    return compressedPath;
                 }
                 finally
                 {
@@ -132,26 +166,18 @@ namespace SThreeQL
         /// <summary>
         /// Executes the task.
         /// </summary>
-        /// <param name="stdOut">A text writer to write standard output messages to.</param>
-        /// <param name="stdError">A text writer to write standard error messages to.</param>
         /// <returns>The result of the execution.</returns>
-        public override TaskExecutionResult Execute(TextWriter stdOut, TextWriter stdError)
+        public override TaskExecutionResult Execute()
         {
-            TaskExecutionResult result = new TaskExecutionResult();
-            stdOut.WriteLine(String.Format("Executing backup target {0}:", Config.Name));
+            TaskExecutionResult result = new TaskExecutionResult() { Target = Target };
+            string path = String.Empty;
 
             try
             {
-                BackupDatabase(stdOut, stdError);
-                UploadBackup(stdOut, stdError);
-
-                stdOut.WriteLine("   Backup complete.");
+                UploadBackup(BackupDatabase());
             }
             catch (Exception ex)
             {
-                stdError.WriteLine(String.Format("   Failed to execute backup task {0}:", Config.Name));
-                stdError.WriteLine("      " + ex.Message);
-                stdError.WriteLine("      " + ex.StackTrace);
                 result.Exception = ex;
                 result.Success = false;
             }
@@ -159,15 +185,12 @@ namespace SThreeQL
             {
                 try
                 {
-                    if (File.Exists(TempPath))
+                    if (!String.IsNullOrEmpty(path) && File.Exists(path))
                     {
-                        File.Delete(TempPath);
+                        File.Delete(path);
                     }
                 }
-                catch
-                {
-                    // Eat it.
-                }
+                catch { }
             }
 
             return result;
@@ -176,72 +199,89 @@ namespace SThreeQL
         /// <summary>
         /// Uploads the backup set to AWS.
         /// </summary>
-        /// <param name="stdOut">A text writer to write standard output messages to.</param>
-        /// <param name="stdError">A text writer to write standard error messages to.</param>
-        private void UploadBackup(TextWriter stdOut, TextWriter stdError)
+        /// <param name="path">The path of the compressed backup to upload.</param>
+        public void UploadBackup(string path)
         {
-            string redirectUrl = Service.GetRedirectUrl(AWSConfig.BucketName, null);
-            stdOut.WriteLine("   Uploading the backup file (" + new FileInfo(TempPath).Length.ToFileSize() + "):");
+            string fileName = Path.GetFileName(path);
+            long fileSize = new FileInfo(path).Length;
 
-            using (ObjectAddRequest request = new ObjectAddRequest(AWSConfig.BucketName, AWSKey))
+            using (FileStream file = File.OpenRead(path))
             {
-                request.Headers.Add("x-amz-acl", "private");
-                request.LoadStreamWithFile(TempPath);
+                PutObjectRequest request = new PutObjectRequest()
+                    .WithCannedACL(S3CannedACL.Private)
+                    .WithBucketName(AWSConfig.BucketName)
+                    .WithKey(fileName);
 
-                if (redirectUrl != null)
+                request.InputStream = file;
+
+                TransferInfo info = new TransferInfo()
                 {
-                    request.RedirectUrl = redirectUrl + AWSKey;
-                }
+                    BytesTransferred = 0,
+                    FileName = fileName,
+                    FileSize = fileSize,
+                    Target = Target
+                };
 
-                bool statusRunning = true;
-                ObjectAddResponse response = null;
+                bool uploading = true;
 
-                Thread statusThread = new Thread(new ThreadStart(delegate()
+                Thread uploadThread = new Thread(new ThreadStart(delegate()
                 {
-                    DateTime lastTime = DateTime.Now;
-                    long lastTransferred = 0;
-
-                    while (statusRunning)
+                    while (uploading)
                     {
                         try
                         {
-                            TransferInfo info = Service.GetTransferInfo(request.ID);
-                            long transferred = info.BytesTransferred;
-                            int percent = (int)((double)transferred / request.BytesTotal * 100d);
+                            info.BytesTransferred = file.Position;
 
-                            if (percent > 0)
+                            if (info.BytesTransferred < info.FileSize)
                             {
-                                TimeSpan duration = DateTime.Now.Subtract(lastTime);
-                                double rate = ((transferred - lastTransferred) / 1024) / duration.TotalSeconds;
-                                stdOut.WriteLine(String.Format("      {0:###}% uploaded ({1:N0} KB/S).", percent, rate));
-
-                                lastTime = DateTime.Now;
-                                lastTransferred = transferred;
-
-                                if (percent == 100)
-                                {
-                                    statusRunning = false;
-                                }
+                                TransferDelegate.OnTransferProgress(info);
                             }
-                        }
-                        catch
-                        {
-                            // The transfer hasn't started yet.
-                        }
 
-                        Thread.Sleep(1000);
+                            Thread.Sleep(500);
+                        }
+                        catch (ObjectDisposedException) { }
                     }
                 }));
 
-                statusThread.Start();
+                TransferDelegate.OnTransferStart(info);
+                uploadThread.Start();
 
-                using (response = Service.ObjectAdd(request)) 
+                using (S3Response response = S3Client.PutObject(request))
                 {
-                    statusRunning = false;
-                    stdOut.WriteLine("      Upload complete.");
+                    uploading = false;
+                    info.BytesTransferred = info.FileSize;
+                    TransferDelegate.OnTransferComplete(info);
                 }
             }
         }
+
+        #endregion
+
+        #region IBackupDelegate Members
+
+        /// <summary>
+        /// Called when a database backup is complete.
+        /// </summary>
+        /// <param name="target">The backup's target.</param>
+        public void OnBackupComplete(DatabaseTargetConfigurationElement target) { }
+
+        /// <summary>
+        /// Called when a database backup begins.
+        /// </summary>
+        /// <param name="target">The backup's target.</param>
+        public void OnBackupStart(DatabaseTargetConfigurationElement target) { }
+
+        /// <summary>
+        /// Called when a database backup file has been compressed.
+        /// </summary>
+        /// <param name="target">The backup's target.</param>
+        public void OnCompressComplete(DatabaseTargetConfigurationElement target) { }
+
+        /// <summary>
+        /// Called when a database backup file is about to be compressed.
+        /// </summary>
+        /// <param name="target">The backup's target.</param>
+        public void OnCompressStart(DatabaseTargetConfigurationElement target) { }
 
         #endregion
     }

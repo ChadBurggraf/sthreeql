@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -31,12 +32,39 @@ namespace SThreeQL.Configuration
         }
 
         /// <summary>
-        /// Gets the target's data source (i.e., server name or IP address).
+        /// Gets a connection string built from this instance's values.
+        /// </summary>
+        public string ConnectionString
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat(CultureInfo.InvariantCulture, "data source={0};connection timeout={1};", DataSource, SThreeQLConfiguration.Section.DatabaseTimeout);
+
+                if (!String.IsNullOrEmpty(DataSourceElement.UserId) && !String.IsNullOrEmpty(DataSourceElement.Password))
+                {
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "user id={0};password={1};", DataSourceElement.UserId, DataSourceElement.Password);
+                }
+
+                return sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of the target's datasource.
         /// </summary>
         [ConfigurationProperty("dataSource", IsRequired = true)]
         public string DataSource
         {
             get { return (string)this["dataSource"]; }
+        }
+
+        /// <summary>
+        /// Gets the configured datasource element for this target.
+        /// </summary>
+        public DataSourceConfigurationElement DataSourceElement
+        {
+            get { return SThreeQLConfiguration.Section.DataSources[DataSource]; }
         }
 
         /// <summary>
@@ -46,26 +74,6 @@ namespace SThreeQL.Configuration
         public string Name
         {
             get { return (string)this["name"]; }
-        }
-
-        /// <summary>
-        /// Gets the password to use when connecting to the target's datasource.
-        /// </summary>
-        [ConfigurationProperty("password", IsRequired = true)]
-        public string Password
-        {
-            get { return (string)this["password"]; }
-        }
-
-        /// <summary>
-        /// Gets the user ID to use when connecting to the target's datasource.
-        /// The user must have access to the master database, as well as
-        /// drop/restore priviledges on the server.
-        /// </summary>
-        [ConfigurationProperty("userId", IsRequired = true)]
-        public string UserId
-        {
-            get { return (string)this["userId"]; }
         }
     }
 }

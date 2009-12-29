@@ -17,7 +17,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("awsTargets")]
         public AWSTargetConfigurationElementCollection AWSTargets
         {
-            get { return (AWSTargetConfigurationElementCollection)(this["awsTargets"] ?? new AWSTargetConfigurationElementCollection()); }
+            get { return (AWSTargetConfigurationElementCollection)(this["awsTargets"] ?? (this["awsTargets"] = new AWSTargetConfigurationElementCollection())); }
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("backupTargets")]
         public DatabaseTargetConfigurationElementCollection BackupTargets
         {
-            get { return (DatabaseTargetConfigurationElementCollection)(this["backupTargets"] ?? new DatabaseTargetConfigurationElementCollection()); }
+            get { return (DatabaseTargetConfigurationElementCollection)(this["backupTargets"] ?? (this["backupTargets"] = new DatabaseTargetConfigurationElementCollection())); }
         }
 
         /// <summary>
@@ -39,12 +39,21 @@ namespace SThreeQL.Configuration
         }
 
         /// <summary>
+        /// Gets the collection of datasources.
+        /// </summary>
+        [ConfigurationProperty("dataSources")]
+        public DataSourceConfigurationElementCollection DataSources
+        {
+            get { return (DataSourceConfigurationElementCollection)(this["dataSources"] ?? (this["dataSources"] = new DataSourceConfigurationElementCollection())); }
+        }
+
+        /// <summary>
         /// Gets the collection of restore database targets.
         /// </summary>
         [ConfigurationProperty("restoreTargets")]
         public DatabaseRestoreTargetConfigurationElementCollection RestoreTargets
         {
-            get { return (DatabaseRestoreTargetConfigurationElementCollection)(this["restoreTargets"] ?? new DatabaseRestoreTargetConfigurationElementCollection()); }
+            get { return (DatabaseRestoreTargetConfigurationElementCollection)(this["restoreTargets"] ?? (this["restoreTargets"] = new DatabaseRestoreTargetConfigurationElementCollection())); }
         }
 
         /// <summary>
@@ -53,7 +62,7 @@ namespace SThreeQL.Configuration
         [ConfigurationProperty("schedules")]
         public ScheduleConfigurationElementCollection Schedules
         {
-            get { return (ScheduleConfigurationElementCollection)(this["schedules"] ?? new ScheduleConfigurationElementCollection()); }
+            get { return (ScheduleConfigurationElementCollection)(this["schedules"] ?? (this["schedules"] = new ScheduleConfigurationElementCollection())); }
         }
 
         /// <summary>
@@ -71,15 +80,6 @@ namespace SThreeQL.Configuration
         public bool UseSSL
         {
             get { return (bool)this["useSsl"]; }
-        }
-
-        /// <summary>
-        /// Gets the location of the WinRAR installation directory if compression is desired.
-        /// </summary>
-        [ConfigurationProperty("winRarLocation", IsRequired = false)]
-        public string WinRarLocation
-        {
-            get { return (string)this["winRarLocation"]; }
         }
     }
 }

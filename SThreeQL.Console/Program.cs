@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Affirma.ThreeSharp.Statistics;
 using SThreeQL.Configuration;
 
 namespace SThreeQL.Console
@@ -15,7 +14,7 @@ namespace SThreeQL.Console
             bool schedule = false;
             bool backup = true;
             bool restore = true;
-            string taskName = null;
+            string targetName = null;
 
             if (args.Length > 0)
             {
@@ -38,17 +37,19 @@ namespace SThreeQL.Console
 
                 if (args.Length > 1)
                 {
-                    taskName = args[1];
+                    targetName = args[1];
                 }
             }
+
+            ConsoleDelegate consoleDelegate = new ConsoleDelegate();
 
             if (schedule)
             {
                 ScheduleConfigurationElementCollection schedules = null;
 
-                if (!String.IsNullOrEmpty(taskName))
+                if (!String.IsNullOrEmpty(targetName))
                 {
-                    ScheduleConfigurationElement config = SThreeQLConfiguration.Section.Schedules[taskName];
+                    ScheduleConfigurationElement config = SThreeQLConfiguration.Section.Schedules[targetName];
 
                     if (config != null)
                     {
@@ -57,7 +58,7 @@ namespace SThreeQL.Console
                     }
                     else
                     {
-                        System.Console.WriteLine(String.Concat("There is no schedule defined for the name \"" + taskName + "\".\n"));
+                        System.Console.WriteLine(String.Concat("There is no schedule defined for the name \"" + targetName + "\".\n"));
                     }
                 }
                 else
@@ -72,61 +73,115 @@ namespace SThreeQL.Console
             {
                 if (backup)
                 {
-                    if (!String.IsNullOrEmpty(taskName))
-                    {
-                        DatabaseTargetConfigurationElement config = SThreeQLConfiguration.Section.BackupTargets[taskName];
-
-                        if (config != null)
-                        {
-                            new BackupTask(config).Execute(System.Console.Out, System.Console.Error);
-                        }
-                        else
-                        {
-                            System.Console.WriteLine(String.Concat("There is no backup task defined for the name \"", taskName, "\".\n"));
-                        }
-
-                        System.Console.WriteLine();
-                    }
-                    else
-                    {
-                        foreach (DatabaseTargetConfigurationElement config in SThreeQLConfiguration.Section.BackupTargets)
-                        {
-                            new BackupTask(config).Execute(System.Console.Out, System.Console.Error);
-                            System.Console.WriteLine();
-                        }
-                    }
+                    ExecuteBackup(consoleDelegate, targetName);
                 }
 
                 if (restore)
                 {
-                    if (!String.IsNullOrEmpty(taskName))
-                    {
-                        DatabaseRestoreTargetConfigurationElement config = SThreeQLConfiguration.Section.RestoreTargets[taskName];
+                    ExecuteRestore(consoleDelegate, targetName);
+                }
+            }
+        }
 
-                        if (config != null)
-                        {
-                            new RestoreTask(config).Execute(System.Console.Out, System.Console.Error);
-                        }
-                        else
-                        {
-                            System.Console.WriteLine(String.Concat("There is no restore task defined for the name \"", taskName, "\".\n"));
-                        }
+        static void ExecuteBackup(ConsoleDelegate consoleDelegate, string targetName)
+        {
+            if (!String.IsNullOrEmpty(targetName))
+            {
+                DatabaseTargetConfigurationElement target = SThreeQLConfiguration.Section.BackupTargets[targetName];
 
-                        System.Console.WriteLine();
-                    }
-                    else
-                    {
-                        foreach (DatabaseRestoreTargetConfigurationElement config in SThreeQLConfiguration.Section.RestoreTargets)
-                        {
-                            new RestoreTask(config).Execute(System.Console.Out, System.Console.Error);
-                            System.Console.WriteLine();
-                        }
-                    }
+                if (target != null)
+                {
+                    ExecuteBackup(consoleDelegate, target);
+                }
+                else
+                {
+                    System.Console.Error.WriteLine(String.Concat("There is no backup target defined for the name \"", targetName, "\"."));
                 }
 
-                System.Console.WriteLine("Press any key to quit.");
-                System.Console.ReadKey();
+                System.Console.WriteLine();
             }
+            else
+            {
+                foreach (DatabaseTargetConfigurationElement target in SThreeQLConfiguration.Section.BackupTargets)
+                {
+                    ExecuteBackup(consoleDelegate, target);
+                    System.Console.WriteLine();
+                }
+            }
+        }
+
+        static void ExecuteBackup(ConsoleDelegate consoleDelegate, DatabaseTargetConfigurationElement target)
+        {
+            try
+            {
+                BackupTask task = new BackupTask(target);
+                task.BackupDelegate = consoleDelegate;
+                task.TransferDelegate = consoleDelegate;
+
+                TaskExecutionResult result = task.Execute();
+
+                if (!result.Success)
+                {
+                    WriteError(result.Exception);
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteError(ex);
+            }
+        }
+
+        static void ExecuteRestore(ConsoleDelegate consoleDelegate, string targetName)
+        {
+            if (!String.IsNullOrEmpty(targetName))
+            {
+                DatabaseRestoreTargetConfigurationElement target = SThreeQLConfiguration.Section.RestoreTargets[targetName];
+
+                if (target != null)
+                {
+                    ExecuteRestore(consoleDelegate, target);
+                }
+                else
+                {
+                    System.Console.Error.WriteLine(String.Concat("There is no restore target defined for the name \"", targetName, "\"."));
+                }
+
+                System.Console.WriteLine();
+            }
+            else
+            {
+                foreach (DatabaseRestoreTargetConfigurationElement target in SThreeQLConfiguration.Section.RestoreTargets)
+                {
+                    ExecuteRestore(consoleDelegate, target);
+                    System.Console.WriteLine();
+                }
+            }
+        }
+
+        static void ExecuteRestore(ConsoleDelegate consoleDelegate, DatabaseRestoreTargetConfigurationElement target)
+        {
+            try
+            {
+                RestoreTask task = new RestoreTask(target);
+                task.RestoreDelegate = consoleDelegate;
+                task.TransferDelegate = consoleDelegate;
+
+                TaskExecutionResult result = task.Execute();
+
+                if (!result.Success)
+                {
+                    WriteError(result.Exception);
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteError(ex);
+            }
+        }
+
+        static void WriteError(Exception ex)
+        {
+            System.Console.Error.WriteLine("Whoops: {0}", ex.Message);
         }
     }
 }

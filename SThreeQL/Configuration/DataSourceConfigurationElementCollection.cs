@@ -7,18 +7,18 @@ using System.Text;
 namespace SThreeQL.Configuration
 {
     /// <summary>
-    /// Represents a collection of targets in a schedule configuration element.
+    /// Represents a collection of <see cref="DataSourceConfigurationElement"/>s.
     /// </summary>
-    public class ScheduleTargetConfigurationElementCollection : ConfigurationElementCollection
+    public class DataSourceConfigurationElementCollection : ConfigurationElementCollection
     {
         /// <summary>
         /// Gets an element by its name.
         /// </summary>
         /// <param name="name">The name of the element to get.</param>
         /// <returns>An element.</returns>
-        public new ScheduleTargetConfigurationElement this[string name]
+        public new DataSourceConfigurationElement this[string name]
         {
-            get { return (ScheduleTargetConfigurationElement)BaseGet(name); }
+            get { return (DataSourceConfigurationElement)BaseGet(name); }
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace SThreeQL.Configuration
         /// <returns>The newly created element.</returns>
         protected override ConfigurationElement CreateNewElement()
         {
-            return new ScheduleTargetConfigurationElement();
+            return new DataSourceConfigurationElement();
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace SThreeQL.Configuration
         /// <returns>The element's key.</returns>
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((ScheduleTargetConfigurationElement)element).Name;
+            return ((DataSourceConfigurationElement)element).Name;
         }
     }
 }

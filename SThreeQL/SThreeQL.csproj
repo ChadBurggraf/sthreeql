@@ -21,19 +21,25 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\SThreeQL.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\SThreeQL.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Affirma.ThreeSharp, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="AWSSDK, Version=1.0.3.0, Culture=neutral, PublicKeyToken=498aea76c1205a29, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\Affirma.ThreeSharp.dll</HintPath>
+      <HintPath>..\Dependencies\AWSSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="DotZLib, Version=1.0.3647.27392, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\DotZLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -61,27 +67,43 @@
     <Compile Include="AWSTask.cs" />
     <Compile Include="BackupTask.cs" />
     <Compile Include="BucketListResponseItem.cs" />
-    <Compile Include="Common.cs" />
     <Compile Include="Configuration\DatabaseRestoreTargetConfigurationElement.cs" />
     <Compile Include="Configuration\DatabaseRestoreTargetConfigurationElementCollection.cs" />
     <Compile Include="Configuration\DatabaseTargetConfigurationElement.cs" />
     <Compile Include="Configuration\DatabaseTargetConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\DataSourceConfigurationElement.cs" />
+    <Compile Include="Configuration\DataSourceConfigurationElementCollection.cs" />
     <Compile Include="Configuration\ScheduleConfigurationElement.cs" />
     <Compile Include="Configuration\ScheduleConfigurationElementCollection.cs" />
     <Compile Include="Configuration\ScheduleTargetConfigurationElement.cs" />
     <Compile Include="Configuration\ScheduleTargetConfigurationElementCollection.cs" />
+    <Compile Include="ICompressor.cs" />
+    <Compile Include="IBackupDelegate.cs" />
+    <Compile Include="IRestoreDelegate.cs" />
+    <Compile Include="ITransferDelegate.cs" />
+    <Compile Include="Primitives.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestoreTask.cs" />
     <Compile Include="Configuration\SThreeQLConfiguration.cs" />
     <Compile Include="Scheduler.cs" />
+    <Compile Include="SqlScript.cs" />
+    <Compile Include="Task.cs" />
     <Compile Include="TaskExecutionResult.cs" />
+    <Compile Include="TransferInfo.cs" />
+    <Compile Include="ZlibCompressor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="GetFiles.sql" />
-    <EmbeddedResource Include="Drop.sql" />
-    <EmbeddedResource Include="Backup.sql" />
-    <EmbeddedResource Include="Restore.sql" />
+    <EmbeddedResource Include="Sql\GetFiles.sql" />
+    <EmbeddedResource Include="Sql\Drop.sql" />
+    <EmbeddedResource Include="Sql\Backup.sql" />
+    <EmbeddedResource Include="Sql\Restore.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Dependencies\zlib1.dll">
+      <Link>zlib1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

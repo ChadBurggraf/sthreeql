@@ -14,7 +14,7 @@ namespace SThreeQL.Configuration
         /// <summary>
         /// Gets or sets an element by its name.
         /// </summary>
-        /// <param name="bucketName">The name of the element to get.</param>
+        /// <param name="name">The name of the element to get.</param>
         /// <returns>An element.</returns>
         public new ScheduleConfigurationElement this[string name]
         {
