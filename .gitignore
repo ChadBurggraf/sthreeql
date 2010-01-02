@@ -3,4 +3,5 @@
 bin
 obj
 TestResults
-*.testrunconfig
+*.vsmdi
+App.config

@@ -21,7 +21,6 @@ namespace SThreeQL
     {
         #region Member Variables
 
-        private static readonly object locker = new object();
         private string backupFileName;
         private IBackupDelegate backupDelegate;
 
@@ -50,7 +49,7 @@ namespace SThreeQL
         {
             get
             {
-                lock (locker)
+                lock (this)
                 {
                     if (backupDelegate == null)
                     {
@@ -62,7 +61,7 @@ namespace SThreeQL
             }
             set
             {
-                lock (locker)
+                lock (this)
                 {
                     backupDelegate = value;
                 }

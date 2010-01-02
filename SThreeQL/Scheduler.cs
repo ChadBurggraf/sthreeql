@@ -14,14 +14,13 @@ namespace SThreeQL
     /// <summary>
     /// Schedules targets based on the configuration.
     /// </summary>
-    public class Scheduler
+    public class Scheduler : IScheduleDelegate
     {
         #region Private Members
 
         private IDictionary<string, DateTime> inProgress;
         private IDictionary<string, DateTime> pending;
-        private TextWriter stdOut, stdError;
-        private readonly object locker = new object();
+        private IScheduleDelegate scheduleDelegate;
         private Thread god;
         private bool running;
 
@@ -38,18 +37,16 @@ namespace SThreeQL
         /// Constructor.
         /// </summary>
         /// <param name="schedules">The schedules collection this instance should manage.</param>
-        public Scheduler(ScheduleConfigurationElementCollection schedules) : this(schedules, null, null) { }
+        public Scheduler(ScheduleConfigurationElementCollection schedules) : this(schedules, null) { }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="schedules">The schedules collection this instance should manage.</param>
-        /// <param name="stdOut">The text writer to write the standard output stream to.</param>
-        /// <param name="stdError">The text writer to write the standard error stream to.</param>
-        public Scheduler(ScheduleConfigurationElementCollection schedules, TextWriter stdOut, TextWriter stdError)
+        /// <param name="scheduleDelegate">The delegate to use.</param>
+        public Scheduler(ScheduleConfigurationElementCollection schedules, IScheduleDelegate scheduleDelegate)
         {
-            this.stdOut = stdOut;
-            this.stdError = stdError;
+            this.scheduleDelegate = scheduleDelegate;
 
             foreach (ScheduleConfigurationElement schedule in schedules)
             {
@@ -71,7 +68,7 @@ namespace SThreeQL
         {
             get
             {
-                lock (locker)
+                lock (this)
                 {
                     if (inProgress == null)
                     {
@@ -90,7 +87,7 @@ namespace SThreeQL
         {
             get
             {
-                lock (locker)
+                lock (this)
                 {
                     if (pending == null)
                     {
@@ -98,6 +95,25 @@ namespace SThreeQL
                     }
 
                     return pending;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the schedule's delegate.
+        /// </summary>
+        public IScheduleDelegate ScheduleDelegate
+        {
+            get
+            {
+                lock (this)
+                {
+                    if (scheduleDelegate == null)
+                    {
+                        scheduleDelegate = this;
+                    }
+
+                    return scheduleDelegate;
                 }
             }
         }
@@ -113,82 +129,47 @@ namespace SThreeQL
         private void ExecuteSchedule(object schd)
         {
             ScheduleConfigurationElement schedule = (ScheduleConfigurationElement)schd;
+            ScheduleDelegate.OnScheduleStart(schedule);
 
-            if (stdOut != null && stdError != null)
-            {
-                ExecuteSchedule(schedule, stdOut, stdError);
-            }
-            else
-            {
-                StringBuilder output = new StringBuilder();
-                StringBuilder error = new StringBuilder();
-
-                using (TextWriter outWriter = new StringWriter(output))
-                {
-                    using (TextWriter errorWriter = new StringWriter(error))
-                    {
-                        ExecuteSchedule(schedule, outWriter, errorWriter);
-                    }
-                }
-
-                const string source = "SThreeQL Service";
-
-                if (!EventLog.SourceExists(source))
-                {
-                    EventLog.CreateEventSource(source, "Application");
-                }
-
-                if (output.Length > 0)
-                {
-                    EventLog.WriteEntry(source, output.ToString(), EventLogEntryType.Information);
-                }
-
-                if (error.Length > 0)
-                {
-                    EventLog.WriteEntry(source, error.ToString(), EventLogEntryType.Error);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Concrete schedule executer.
-        /// </summary>
-        /// <param name="schedule">The schedule to execute.</param>
-        /// <param name="stdOut">The text writer to write standard output to.</param>
-        /// <param name="stdError">The text writer to write standard error to.</param>
-        private void ExecuteSchedule(ScheduleConfigurationElement schedule, TextWriter stdOut, TextWriter stdError)
-        {
             foreach (ScheduleTargetConfigurationElement target in schedule.BackupTagets)
             {
+                DatabaseTargetConfigurationElement config = null;
+
                 try
                 {
-                    DatabaseTargetConfigurationElement config = SThreeQLConfiguration.Section.BackupTargets[target.Name];
-                    new BackupTask(config).Execute();
+                    config = SThreeQLConfiguration.Section.BackupTargets[target.Name];
+                    BackupTask task = new BackupTask(config);
+                    task.BackupDelegate = ScheduleDelegate.BackupDelegate;
+                    task.TransferDelegate = ScheduleDelegate.TransferDelegate;
+                    task.Execute();
                 }
                 catch (Exception ex)
                 {
-                    stdError.WriteLine("An unhandled exception occurred when running backup task " + target.Name + ":");
-                    stdError.WriteLine(ex.Message);
-                    stdError.WriteLine(ex.StackTrace);
+                    ScheduleDelegate.OnBackupError(schedule, config, ex);
                 }
             }
 
             foreach (ScheduleTargetConfigurationElement target in schedule.RestoreTargets)
             {
+                DatabaseRestoreTargetConfigurationElement config = null;
+
                 try
                 {
-                    DatabaseRestoreTargetConfigurationElement config = SThreeQLConfiguration.Section.RestoreTargets[target.Name];
-                    new RestoreTask(config).Execute();
+                    config = SThreeQLConfiguration.Section.RestoreTargets[target.Name];
+                    RestoreTask task = new RestoreTask(config);
+                    task.RestoreDelegate = ScheduleDelegate.RestoreDelegate;
+                    task.TransferDelegate = ScheduleDelegate.TransferDelegate;
+                    task.Execute();
                 }
                 catch (Exception ex)
                 {
-                    stdError.WriteLine("An unhandled exception occurred when running restore task " + target.Name + ":");
-                    stdError.WriteLine(ex.Message);
-                    stdError.WriteLine(ex.StackTrace);
+                    ScheduleDelegate.OnRestoreError(schedule, config, ex);
                 }
             }
 
-            lock (locker)
+            ScheduleDelegate.OnScheduleFinish(schedule);
+
+            lock (this)
             {
                 InProgress.Remove(schedule.Name);
                 Pending.Add(schedule.Name, GetNextExecuteDate(schedule));
@@ -204,7 +185,7 @@ namespace SThreeQL
             {
                 if (running)
                 {
-                    lock (locker)
+                    lock (this)
                     {
                         var q = (from kvp in Pending
                                  where kvp.Value <= DateTime.Now
@@ -250,7 +231,18 @@ namespace SThreeQL
         /// <returns>The schedule's next execution date.</returns>
         public static DateTime GetNextExecuteDate(ScheduleConfigurationElement schedule)
         {
-            if (DateTime.Now < schedule.StartDate)
+            return GetNextExecuteDate(schedule, DateTime.Now);
+        }
+
+        /// <summary>
+        /// Gets the next execution date for the given schedule.
+        /// </summary>
+        /// <param name="schedule">The schedule to get the next execution date for.</param>
+        /// <param name="now">The reference time to compare schedule dates to.</param>
+        /// <returns>The schedule's next execution date.</returns>
+        public static DateTime GetNextExecuteDate(ScheduleConfigurationElement schedule, DateTime now)
+        {
+            if (now < schedule.StartDate)
             {
                 return schedule.StartDate;
             }
@@ -259,9 +251,56 @@ namespace SThreeQL
             // TODO: The only repeat type is Daily right now.
             //
 
-            int days = (int)Math.Floor(DateTime.Now.Subtract(schedule.StartDate).TotalDays);
+            int days = (int)Math.Ceiling(now.Subtract(schedule.StartDate).TotalDays);
             return schedule.StartDate.AddDays(days);
         }
+
+        #endregion
+
+        #region IScheduleDelegate Members
+
+        /// <summary>
+        /// Gets or sets the backup delegate.
+        /// </summary>
+        public IBackupDelegate BackupDelegate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the restore delegate.
+        /// </summary>
+        public IRestoreDelegate RestoreDelegate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the transfer delegate.
+        /// </summary>
+        public ITransferDelegate TransferDelegate { get; set; }
+
+        /// <summary>
+        /// Called when an uncaught exception occurs during the execution of a scheduled backup target.
+        /// </summary>
+        /// <param name="schedule">The schedule that was executing when the error occurred.</param>
+        /// <param name="target">The backup target that caused the error.</param>
+        /// <param name="ex">The exception that occurred.</param>
+        public void OnBackupError(ScheduleConfigurationElement schedule, DatabaseTargetConfigurationElement target, Exception ex) { }
+
+        /// <summary>
+        /// Called when an uncaught exception occurs during the execution of a schedule restore target.
+        /// </summary>
+        /// <param name="schedule">The schedule that was executing when the error occurred.</param>
+        /// <param name="target">The restore target that caused the error.</param>
+        /// <param name="ex">The exception that occurred.</param>
+        public void OnRestoreError(ScheduleConfigurationElement schedule, DatabaseRestoreTargetConfigurationElement target, Exception ex) { }
+
+        /// <summary>
+        /// Called when a schedule finishes.
+        /// </summary>
+        /// <param name="schedule">The schedule that is finishing.</param>
+        public void OnScheduleFinish(ScheduleConfigurationElement schedule) { }
+
+        /// <summary>
+        /// Called when a schedule starts.
+        /// </summary>
+        /// <param name="schedule">The schedule that is starting.</param>
+        public void OnScheduleStart(ScheduleConfigurationElement schedule) { }
 
         #endregion
     }

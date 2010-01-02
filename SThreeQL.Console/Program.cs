@@ -58,7 +58,7 @@ namespace SThreeQL.Console
                     }
                     else
                     {
-                        System.Console.WriteLine(String.Concat("There is no schedule defined for the name \"" + targetName + "\".\n"));
+                        System.Console.Error.WriteLine(String.Concat("There is no schedule defined for the name \"" + targetName + "\".\n"));
                     }
                 }
                 else
@@ -66,8 +66,7 @@ namespace SThreeQL.Console
                     schedules = SThreeQLConfiguration.Section.Schedules;
                 }
 
-
-                new Scheduler(schedules, System.Console.Out, System.Console.Error).Start();
+                new Scheduler(schedules, consoleDelegate).Start();
             }
             else
             {

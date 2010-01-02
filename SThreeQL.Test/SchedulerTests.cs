@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,19 +23,19 @@ namespace SThreeQL.Test
             {
                 StartDate = nowPlusOneHour,
                 Repeat = ScheduleRepeatType.Daily
-            }));
+            }, now));
 
             Assert.AreEqual(now, Scheduler.GetNextExecuteDate(new ScheduleConfigurationElement()
             {
                 StartDate = now,
                 Repeat = ScheduleRepeatType.Daily
-            }));
+            }, now));
 
             Assert.AreEqual(now, Scheduler.GetNextExecuteDate(new ScheduleConfigurationElement()
             {
                 StartDate = nowMinusOneDay,
                 Repeat = ScheduleRepeatType.Daily
-            }));
+            }, now));
         }
     }
 }

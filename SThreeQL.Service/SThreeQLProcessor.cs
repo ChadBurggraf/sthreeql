@@ -24,7 +24,7 @@ namespace SThreeQL.Service
         public SThreeQLProcessor()
         {
             InitializeComponent();
-            scheduler = new Scheduler();
+            scheduler = new Scheduler(SThreeQLConfiguration.Section.Schedules, new EventLogDelegate());
         }
 
         #region Base Overrides
@@ -61,6 +61,6 @@ namespace SThreeQL.Service
             scheduler.Stop();
         }
 
-        #endregion*/
+        #endregion
     }
 }

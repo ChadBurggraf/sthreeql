@@ -37,7 +37,7 @@ namespace SThreeQL.Test
             task.UploadBackup(path);
         }
 
-        protected static DatabaseTargetConfigurationElement GetBackupTarget()
+        static DatabaseTargetConfigurationElement GetBackupTarget()
         {
             return (from DatabaseTargetConfigurationElement t in SThreeQLConfiguration.Section.BackupTargets
                     select t).First();

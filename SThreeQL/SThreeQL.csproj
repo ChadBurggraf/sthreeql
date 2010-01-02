@@ -77,9 +77,12 @@
     <Compile Include="Configuration\ScheduleConfigurationElementCollection.cs" />
     <Compile Include="Configuration\ScheduleTargetConfigurationElement.cs" />
     <Compile Include="Configuration\ScheduleTargetConfigurationElementCollection.cs" />
+    <Compile Include="ConsoleDelegate.cs" />
+    <Compile Include="EventLogDelegate.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="IBackupDelegate.cs" />
     <Compile Include="IRestoreDelegate.cs" />
+    <Compile Include="IScheduleDelegate.cs" />
     <Compile Include="ITransferDelegate.cs" />
     <Compile Include="Primitives.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -93,7 +96,6 @@
     <Compile Include="ZlibCompressor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <EmbeddedResource Include="Sql\GetFiles.sql" />
     <EmbeddedResource Include="Sql\Drop.sql" />
     <EmbeddedResource Include="Sql\Backup.sql" />
