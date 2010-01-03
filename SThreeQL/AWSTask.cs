@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using Amazon;
@@ -18,6 +20,7 @@ namespace SThreeQL
     public abstract class AWSTask : Task, ITransferDelegate
     {
         private static readonly object locker = new object();
+        private static bool servicePointInitialized;
         private ITransferDelegate transferDelegate;
 
         /// <summary>
@@ -35,6 +38,8 @@ namespace SThreeQL
             {
                 throw new ArgumentNullException("awsConfig cannot be null.");
             }
+
+            EnsureServicePointInitialized();
 
             AWSConfig = awsConfig;
 
@@ -78,6 +83,26 @@ namespace SThreeQL
                 lock (locker)
                 {
                     transferDelegate = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ensures the <see cref="ServicePointManager"/> is initialized to accept all SSL certificates.
+        /// We're only making AWS calls, so I think we can blindly trust their certificates.
+        /// </summary>
+        private static void EnsureServicePointInitialized()
+        {
+            lock (locker)
+            {
+                if (!servicePointInitialized)
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(delegate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+                    {
+                        return true;
+                    });
+
+                    servicePointInitialized = true;
                 }
             }
         }
