@@ -166,6 +166,39 @@ namespace SThreeQL
         }
 
         /// <summary>
+        /// Executes the task.
+        /// </summary>
+        /// <returns>The result of the execution.</returns>
+        public override TaskExecutionResult Execute()
+        {
+            TaskExecutionResult result = new TaskExecutionResult() { Target = Target };
+            string path = String.Empty;
+
+            try
+            {
+                RestoreDatabase(DownloadBackup());
+            }
+            catch (Exception ex)
+            {
+                result.Exception = ex;
+                result.Success = false;
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                }
+                catch { }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Gets the latest backup set item by last modified date.
         /// </summary>
         /// <returns>The latest backup set.</returns>
@@ -202,40 +235,7 @@ namespace SThreeQL
                 throw new InvalidOperationException(String.Concat("There was no backup set found for catalog \"", Target.CatalogName, "\"."));
             }
 
-            return objects.OrderByDescending(o => o.LastModified).First();
-        }
-
-        /// <summary>
-        /// Executes the task.
-        /// </summary>
-        /// <returns>The result of the execution.</returns>
-        public override TaskExecutionResult Execute()
-        {
-            TaskExecutionResult result = new TaskExecutionResult() { Target = Target };
-            string path = String.Empty;
-
-            try
-            {
-                RestoreDatabase(DownloadBackup());
-            }
-            catch (Exception ex)
-            {
-                result.Exception = ex;
-                result.Success = false;
-            }
-            finally
-            {
-                try
-                {
-                    if (File.Exists(path))
-                    {
-                        File.Delete(path);
-                    }
-                }
-                catch { }
-            }
-
-            return result;
+            return objects.OrderByDescending(o => DateTime.Parse(o.LastModified, CultureInfo.InvariantCulture)).First();
         }
 
         /// <summary>
