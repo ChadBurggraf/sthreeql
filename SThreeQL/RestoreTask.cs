@@ -63,6 +63,14 @@ namespace SThreeQL
         }
 
         /// <summary>
+        /// Gets the configuration-defined temporary directory to use for this task type.
+        /// </summary>
+        protected override string ConfiguredTempDir 
+        { 
+            get { return SThreeQLConfiguration.Section.RestoreTargets.TempDir; } 
+        }
+
+        /// <summary>
         /// Gets or sets the restore delegate.
         /// </summary>
         public IRestoreDelegate RestoreDelegate
@@ -103,7 +111,7 @@ namespace SThreeQL
         /// <returns>The path to the downloaded and decompressed backup file.</returns>
         public string DownloadBackup()
         {
-            return DownloadBackup(new ZlibCompressor());
+            return DownloadBackup(new GZipCompressor());
         }
 
         /// <summary>
@@ -176,7 +184,8 @@ namespace SThreeQL
 
             try
             {
-                RestoreDatabase(DownloadBackup());
+                path = DownloadBackup();
+                RestoreDatabase(path);
             }
             catch (Exception ex)
             {

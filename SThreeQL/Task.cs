@@ -14,26 +14,28 @@ namespace SThreeQL
     public abstract class Task
     {
         private static readonly object locker = new object();
-        private static string tempDir;
+        private string tempDir;
+
+        /// <summary>
+        /// Gets the configuration-defined temporary directory to use for this task type.
+        /// </summary>
+        protected abstract string ConfiguredTempDir { get; }
 
         /// <summary>
         /// Gets the directory to write temporary files to.
         /// </summary>
-        protected static string TempDir
+        protected string TempDir
         {
             get
             {
-                lock (locker)
+                if (tempDir == null)
                 {
-                    if (tempDir == null)
-                    {
-                        tempDir = !String.IsNullOrEmpty(SThreeQLConfiguration.Section.BackupTargets.TempDir) ?
-                            SThreeQLConfiguration.Section.BackupTargets.TempDir :
-                            Path.GetTempPath();
-                    }
-
-                    return tempDir;
+                    tempDir = !String.IsNullOrEmpty(ConfiguredTempDir) ?
+                        ConfiguredTempDir :
+                        Path.GetTempPath();
                 }
+
+                return tempDir;
             }
         }
 
@@ -55,15 +57,6 @@ namespace SThreeQL
                 @"_+",
                 "_"
             );
-        }
-
-        /// <summary>
-        /// Gets a random file name located in the configured temporary directory.
-        /// </summary>
-        /// <returns>A random, temporary file name.</returns>
-        protected static string GetTemporaryPath()
-        {
-            return Path.Combine(TempDir, Path.GetRandomFileName());
         }
     }
 }

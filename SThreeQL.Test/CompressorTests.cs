@@ -20,18 +20,18 @@ namespace SThreeQL.Test
         }
 
         [TestMethod]
-        public void Compressor_CanCompressZlib()
+        public void Compressor_CanCompressIonic()
         {
-            ICompressor compressor = new ZlibCompressor();
+            ICompressor compressor = new GZipCompressor();
             string archive = compressor.Compress(TestFilePath);
 
             Assert.IsTrue(File.Exists(archive));
         }
 
         [TestMethod]
-        public void Compressor_CanDecompressZlib()
+        public void Compressor_CanDecompressIonic()
         {
-            ICompressor compressor = new ZlibCompressor();
+            ICompressor compressor = new GZipCompressor();
             string file = compressor.Decompress(compressor.Compress(TestFilePath));
 
             Assert.IsTrue(File.Exists(file));

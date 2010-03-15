@@ -90,6 +90,14 @@ namespace SThreeQL
         }
 
         /// <summary>
+        /// Gets the configuration-defined temporary directory to use for this task type.
+        /// </summary>
+        protected override string ConfiguredTempDir 
+        { 
+            get { return SThreeQLConfiguration.Section.BackupTargets.TempDir; } 
+        }
+
+        /// <summary>
         /// Gets the configuration element identifying the backup target to execute.
         /// </summary>
         public DatabaseTargetConfigurationElement Target { get; protected set; }
@@ -104,7 +112,7 @@ namespace SThreeQL
         /// <returns>The path to the compressed backup file.</returns>
         public string BackupDatabase()
         {
-            return BackupDatabase(new ZlibCompressor());
+            return BackupDatabase(new GZipCompressor());
         }
 
         /// <summary>
@@ -173,7 +181,8 @@ namespace SThreeQL
 
             try
             {
-                UploadBackup(BackupDatabase());
+                path = BackupDatabase();
+                UploadBackup(path);
             }
             catch (Exception ex)
             {

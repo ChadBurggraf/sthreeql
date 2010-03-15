@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using DotZLib;
-using SThreeQL.Configuration;
+using Ionic.Zlib;
 
 namespace SThreeQL
 {
     /// <summary>
-    /// Implements simple path compression/decompression using GZip
-    /// and ZLib1.dll.
+    /// Implements file compression and decompression using the Ionic Zlib library.
     /// </summary>
-    public class ZlibCompressor : ICompressor
+    public class GZipCompressor : ICompressor
     {
         /// <summary>
         /// Compresses the file at the given path. Returns the path to the
@@ -31,16 +25,19 @@ namespace SThreeQL
                 File.Delete(outputPath);
             }
 
-            using (GZipStream gzip = new GZipStream(outputPath, CompressLevel.Best))
+            using (FileStream fs = File.OpenRead(path))
             {
-                using (FileStream file = File.OpenRead(path))
+                using (FileStream output = File.Create(outputPath))
                 {
-                    byte[] buffer = new byte[4096];
-                    int count = 0;
-
-                    while (0 < (count = file.Read(buffer, 0, buffer.Length)))
+                    using (GZipStream gzip = new GZipStream(output, CompressionMode.Compress, CompressionLevel.BestCompression))
                     {
-                        gzip.Write(buffer, 0, count);
+                        byte[] buffer = new byte[4096];
+                        int count = 0;
+
+                        while (0 < (count = fs.Read(buffer, 0, buffer.Length)))
+                        {
+                            gzip.Write(buffer, 0, count);
+                        }
                     }
                 }
             }
@@ -63,16 +60,19 @@ namespace SThreeQL
                 File.Delete(outputPath);
             }
 
-            using (FileStream file = File.Create(outputPath))
+            using (FileStream fs = File.OpenRead(path))
             {
-                using (GZipStream gzip = new GZipStream(path))
+                using (FileStream output = File.Create(outputPath))
                 {
-                    byte[] buffer = new byte[4096];
-                    int count = 0;
-
-                    while (0 < (count = gzip.Read(buffer, 0, buffer.Length)))
+                    using (GZipStream gzip = new GZipStream(fs, CompressionMode.Decompress))
                     {
-                        file.Write(buffer, 0, count);
+                        byte[] buffer = new byte[4096];
+                        int count = 0;
+
+                        while (0 < (count = gzip.Read(buffer, 0, buffer.Length)))
+                        {
+                            output.Write(buffer, 0, count);
+                        }
                     }
                 }
             }

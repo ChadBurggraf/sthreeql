@@ -37,9 +37,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\AWSSDK.dll</HintPath>
     </Reference>
-    <Reference Include="DotZLib, Version=1.0.3647.27392, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Ionic.Zlib, Version=1.9.1.2, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\DotZLib.dll</HintPath>
+      <HintPath>..\Dependencies\Ionic.Zlib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -79,6 +79,7 @@
     <Compile Include="Configuration\ScheduleTargetConfigurationElementCollection.cs" />
     <Compile Include="ConsoleDelegate.cs" />
     <Compile Include="EventLogDelegate.cs" />
+    <Compile Include="GZipCompressor.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="IBackupDelegate.cs" />
     <Compile Include="IRestoreDelegate.cs" />
@@ -93,19 +94,12 @@
     <Compile Include="Task.cs" />
     <Compile Include="TaskExecutionResult.cs" />
     <Compile Include="TransferInfo.cs" />
-    <Compile Include="ZlibCompressor.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Sql\GetFiles.sql" />
     <EmbeddedResource Include="Sql\Drop.sql" />
     <EmbeddedResource Include="Sql\Backup.sql" />
     <EmbeddedResource Include="Sql\Restore.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Dependencies\zlib1.dll">
-      <Link>zlib1.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
