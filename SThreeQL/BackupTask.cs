@@ -211,6 +211,14 @@ namespace SThreeQL
         public void UploadBackup(string path)
         {
             string fileName = Path.GetFileName(path);
+
+            if (!String.IsNullOrEmpty(Target.AWSPrefix))
+            {
+                fileName = Target.AWSPrefix.EndsWith("/", StringComparison.Ordinal) ? 
+                    Target.AWSPrefix + fileName : 
+                    Target.AWSPrefix + "/" + fileName;
+            }
+
             long fileSize = new FileInfo(path).Length;
 
             using (FileStream file = File.OpenRead(path))

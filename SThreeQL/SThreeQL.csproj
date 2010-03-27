@@ -73,6 +73,7 @@
     <Compile Include="Configuration\DatabaseTargetConfigurationElementCollection.cs" />
     <Compile Include="Configuration\DataSourceConfigurationElement.cs" />
     <Compile Include="Configuration\DataSourceConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\OnCompleteConfigurationElement.cs" />
     <Compile Include="Configuration\ScheduleConfigurationElement.cs" />
     <Compile Include="Configuration\ScheduleConfigurationElementCollection.cs" />
     <Compile Include="Configuration\ScheduleTargetConfigurationElement.cs" />

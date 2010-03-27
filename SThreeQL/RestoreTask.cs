@@ -55,7 +55,17 @@ namespace SThreeQL
             {
                 if (awsPrefix == null)
                 {
-                    awsPrefix = EscapeCatalogName(Target.CatalogName);
+                    if (!String.IsNullOrEmpty(Target.AWSPrefix))
+                    {
+                        awsPrefix = Target.AWSPrefix;
+
+                        if (!awsPrefix.EndsWith("/", StringComparison.Ordinal))
+                        {
+                            awsPrefix += "/";
+                        }
+                    }
+
+                    awsPrefix += EscapeCatalogName(Target.CatalogName);
                 }
 
                 return awsPrefix;
@@ -122,7 +132,19 @@ namespace SThreeQL
         public string DownloadBackup(ICompressor compressor)
         {
             S3Object latest = GetLatestBackupItem();
-            string path = Path.Combine(TempDir, latest.Key);
+            string path = latest.Key;
+
+            if (!String.IsNullOrEmpty(Target.AWSPrefix) && path.StartsWith(Target.AWSPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                path = path.Substring(Target.AWSPrefix.Length);
+
+                if (path.StartsWith("/")) 
+                {
+                    path = path.Substring(1);
+                }
+            }
+
+            path = Path.Combine(TempDir, path);
             string fileName = Path.GetFileName(path);
 
             if (File.Exists(path))

@@ -23,6 +23,15 @@ namespace SThreeQL.Configuration
         }
 
         /// <summary>
+        /// Gets the optional prefix to use when when storing this target on AWS.
+        /// </summary>
+        [ConfigurationProperty("awsPrefix", IsRequired = false)]
+        public string AWSPrefix
+        {
+            get { return (string)this["awsPrefix"]; }
+        }
+
+        /// <summary>
         /// Gets the target's catalog name.
         /// </summary>
         [ConfigurationProperty("catalogName", IsRequired = true)]
@@ -74,6 +83,12 @@ namespace SThreeQL.Configuration
         public string Name
         {
             get { return (string)this["name"]; }
+        }
+
+        [ConfigurationProperty("onComplete", IsRequired = false)]
+        public OnCompleteConfigurationElement OnComplete
+        {
+            get { return (OnCompleteConfigurationElement)this["onComplete"]; }
         }
     }
 }
