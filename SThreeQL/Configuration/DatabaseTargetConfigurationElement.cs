@@ -84,11 +84,5 @@ namespace SThreeQL.Configuration
         {
             get { return (string)this["name"]; }
         }
-
-        [ConfigurationProperty("onComplete", IsRequired = false)]
-        public OnCompleteConfigurationElement OnComplete
-        {
-            get { return (OnCompleteConfigurationElement)this["onComplete"]; }
-        }
     }
 }

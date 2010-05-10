@@ -46,28 +46,6 @@ namespace SThreeQL
         /// <returns>The result of the execution.</returns>
         public abstract TaskExecutionResult Execute();
 
-        protected virtual void RunOnComplete(DatabaseTargetConfigurationElement target)
-        {
-            if (target.OnComplete != null)
-            {
-                Process process = new Process();
-                process.StartInfo.FileName = target.OnComplete.Executable;
-                process.StartInfo.UseShellExecute = false;
-
-                if (!String.IsNullOrEmpty(target.OnComplete.Arguments))
-                {
-                    process.StartInfo.Arguments = target.OnComplete.Arguments;
-                }
-
-                if (!String.IsNullOrEmpty(target.OnComplete.WorkingDirectory))
-                {
-                    process.StartInfo.WorkingDirectory = target.OnComplete.WorkingDirectory;
-                }
-
-                
-            }
-        }
-
         /// <summary>
         /// Escapes a catalog name to be pretty and URL-safe.
         /// </summary>
