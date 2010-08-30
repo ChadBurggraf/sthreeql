@@ -1,0 +1,15 @@
+<stylecopresultscache>
+  <version>10</version>
+  <project key="-329257508">
+    <configuration>DEBUG;TRACE</configuration>
+  </project>
+  <sourcecode name="SThreeQLConsole.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>10/29/2009 08:55:06</timestamp>
+      <milliseconds>0</milliseconds>
+    </settings>
+    <timestamp>08/29/2010 23:26:00</timestamp>
+    <milliseconds>754</milliseconds>
+    <violations />
+  </sourcecode>
+</stylecopresultscache>

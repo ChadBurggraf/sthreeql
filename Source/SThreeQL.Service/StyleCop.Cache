@@ -1,0 +1,69 @@
+<stylecopresultscache>
+  <version>10</version>
+  <sourcecode name="AssemblyInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/29/2010 23:54:55</timestamp>
+      <milliseconds>819</milliseconds>
+    </settings>
+    <timestamp>08/29/2010 23:54:29</timestamp>
+    <milliseconds>568</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SolutionInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/29/2010 23:54:55</timestamp>
+      <milliseconds>819</milliseconds>
+    </settings>
+    <timestamp>08/29/2010 23:53:28</timestamp>
+    <milliseconds>141</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SThreeQLService.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/29/2010 23:54:55</timestamp>
+      <milliseconds>819</milliseconds>
+    </settings>
+    <timestamp>08/29/2010 23:28:28</timestamp>
+    <milliseconds>172</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ProjectInstaller.Designer.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/29/2010 23:54:55</timestamp>
+      <milliseconds>819</milliseconds>
+    </settings>
+    <timestamp>11/05/2009 18:04:52</timestamp>
+    <milliseconds>935</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SThreeQLProcessor.Designer.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/29/2010 23:54:55</timestamp>
+      <milliseconds>819</milliseconds>
+    </settings>
+    <timestamp>11/05/2009 18:04:52</timestamp>
+    <milliseconds>938</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ProjectInstaller.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/29/2010 23:54:55</timestamp>
+      <milliseconds>819</milliseconds>
+    </settings>
+    <timestamp>08/29/2010 23:56:26</timestamp>
+    <milliseconds>407</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SThreeQLProcessor.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/29/2010 23:54:55</timestamp>
+      <milliseconds>819</milliseconds>
+    </settings>
+    <timestamp>08/29/2010 23:56:43</timestamp>
+    <milliseconds>480</milliseconds>
+    <violations />
+  </sourcecode>
+  <project key="1193532218">
+    <configuration>DEBUG;TRACE</configuration>
+  </project>
+</stylecopresultscache>

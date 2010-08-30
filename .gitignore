@@ -1,7 +1,8 @@
 *.suo
 *.csproj.user
-bin
-obj
-TestResults
 *.vsmdi
 App.config
+bin/
+obj/
+TestResults/
+Build/

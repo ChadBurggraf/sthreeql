@@ -1,0 +1,10 @@
+﻿BACKUP DATABASE @Catalog
+TO DISK = @Path
+WITH 
+	NOFORMAT, 
+	INIT,
+	NAME = @Name, 
+	SKIP, 
+	NOREWIND, 
+	NOUNLOAD,
+	STATS = 10

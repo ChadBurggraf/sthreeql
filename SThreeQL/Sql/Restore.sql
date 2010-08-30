@@ -1,5 +1,0 @@
-﻿RESTORE DATABASE @RestoreCatalog 
-FROM DISK = @Path
-WITH  
-	FILE = 1,  
-{0}REPLACE

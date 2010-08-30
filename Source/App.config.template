@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <configSections>
+    <section name="sThreeQL" type="SThreeQL.Configuration.SThreeQLConfiguration, SThreeQL"/>
+  </configSections>
+  <sThreeQL useSsl="false" databaseTimeout="1200">
+    <awsTargets>
+      <add bucketName="" awsAccessKeyId="" awsSecretAccessKeyId=""/>
+    </awsTargets>
+    <dataSources>
+      <add name="" userId="" password=""/>
+    </dataSources>
+    <schedules>
+      <add name="" startDate="1/1/1970 12:00 AM" repeat="Daily">
+        <backupTargets>
+          <add name=""/>
+        </backupTargets>
+        <restoreTargets>
+          <add name=""/>
+        </restoreTargets>
+      </add>
+    </schedules>
+    <backupTargets>
+      <add name="" awsBucketName="" awsPrefix="" dataSource="" catalogName=""/>
+    </backupTargets>
+    <restoreTargets>
+      <add name="" awsBucketName="" awsPrefix="" dataSource="" catalogName="" restorePath=""/>
+    </restoreTargets>
+  </sThreeQL>
+</configuration>

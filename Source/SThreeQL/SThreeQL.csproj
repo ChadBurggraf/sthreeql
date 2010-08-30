@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F56DD011-44A0-4A9F-A243-302FFD0DDD78}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SThreeQL</RootNamespace>
+    <AssemblyName>SThreeQL</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\SThreeQL.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\SThreeQL.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AWSSDK, Version=1.0.3.0, Culture=neutral, PublicKeyToken=498aea76c1205a29, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\AWSSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zlib, Version=1.9.1.2, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Ionic.Zlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Configuration\AWSTargetConfigurationElement.cs" />
+    <Compile Include="Configuration\AWSTargetConfigurationElementCollection.cs" />
+    <Compile Include="AWSTask.cs" />
+    <Compile Include="BackupTask.cs" />
+    <Compile Include="BucketListResponseItem.cs" />
+    <Compile Include="Configuration\ConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\DatabaseRestoreTargetConfigurationElement.cs" />
+    <Compile Include="Configuration\DatabaseRestoreTargetConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\DatabaseTargetConfigurationElement.cs" />
+    <Compile Include="Configuration\DatabaseTargetConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\DataSourceConfigurationElement.cs" />
+    <Compile Include="Configuration\DataSourceConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\ScheduleConfigurationElement.cs" />
+    <Compile Include="Configuration\ScheduleConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\ScheduleTargetConfigurationElement.cs" />
+    <Compile Include="Configuration\ScheduleTargetConfigurationElementCollection.cs" />
+    <Compile Include="DatabaseTargetEventArgs.cs" />
+    <Compile Include="GZipCompressor.cs" />
+    <Compile Include="ICompressor.cs" />
+    <Compile Include="Primitives.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RestoreDatabaseTargetEventArgs.cs" />
+    <Compile Include="RestoreTask.cs" />
+    <Compile Include="Configuration\SThreeQLConfiguration.cs" />
+    <Compile Include="ScheduleEventArgs.cs" />
+    <Compile Include="ScheduleOperationType.cs" />
+    <Compile Include="Scheduler.cs" />
+    <Compile Include="ScheduleRepeatType.cs" />
+    <Compile Include="SqlScript.cs" />
+    <Compile Include="Task.cs" />
+    <Compile Include="TaskExecutionResult.cs" />
+    <Compile Include="TransferInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Sql\GetFiles.sql" />
+    <EmbeddedResource Include="Sql\Drop.sql" />
+    <EmbeddedResource Include="Sql\Backup.sql" />
+    <EmbeddedResource Include="Sql\Restore.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
