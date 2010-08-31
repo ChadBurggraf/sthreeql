@@ -6,30 +6,37 @@
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <BuildDir Condition="'$(BuildDir)' == ''">$(MSBuildProjectDirectory)\Build</BuildDir>
     <ConsoleDir>$(MSBuildProjectDirectory)\Source\SThreeQL.Console</ConsoleDir>
+    <ConsoleOutDir>$(ConsoleDir)\bin\$(Configuration)</ConsoleOutDir>
     <ILMergePath Condition="'$(ILMergePath)' == ''">$(ProgramFiles)\Microsoft\ILMerge\ILMerge.exe</ILMergePath>
     <LibDir>$(MSBuildProjectDirectory)\Lib</LibDir>
     <LibraryDir>$(MSBuildProjectDirectory)\Source\SThreeQL</LibraryDir>
+    <LibraryOutDir>$(LibraryDir)\bin\$(Configuration)</LibraryOutDir>
     <ServiceDir>$(MSBuildProjectDirectory)\Source\SThreeQL.Service</ServiceDir>
+    <ServiceOutDir>$(ServiceDir)\bin\$(Configuration)</ServiceOutDir>
+    <SignAssemblies Condition="'$(SignAssemblies)' == ''">false</SignAssemblies>
   </PropertyGroup>
 
+  <Choose>
+    <When Condition="'$(SignAssemblies)' == 'true'">
+      <PropertyGroup>
+        <ConsoleKeyFile>/keyfile:"$(ConsoleDir)\SThreeQL.Console.snk"</ConsoleKeyFile>
+        <LibraryKeyFile>/keyfile:"$(LibraryDir)\SThreeQL.snk"</LibraryKeyFile>
+      </PropertyGroup>
+    </When>
+  </Choose>
+
   <Target Name="Build">
-    <PropertyGroup>
-      <ConsoleOutDir>$(ConsoleDir)\bin\$(Configuration)</ConsoleOutDir>
-      <LibraryOutDir>$(LibraryDir)\bin\$(Configuration)</LibraryOutDir>
-      <ServiceOutDir>$(ServiceDir)\bin\$(Configuration)</ServiceOutDir>
-    </PropertyGroup>
-    
     <RemoveDir Directories="$(BuildDir)"/>
     <MakeDir Directories="$(BuildDir)\Console;$(BuildDir)\Service"/>
 
     <MSBuild Projects="$(MSBuildProjectDirectory)\Source\SThreeQL.sln" Properties="Configuration=$(Configuration)"/>
 
     <Message Text='Merging assemblies into "SThreeQL.dll".'/>
-    <Exec Command='"$(ILMergePath)" /ndebug /out:"$(BuildDir)\Console\SThreeQL.dll" "$(LibraryOutDir)\SThreeQL.dll" "$(LibDir)\AWSSDK.dll" "$(LibDir)\Ionic.Zlib.dll"'/>
+    <Exec Command='"$(ILMergePath)" /ndebug $(LibraryKeyFile) /out:"$(BuildDir)\Console\SThreeQL.dll" "$(LibraryOutDir)\SThreeQL.dll" "$(LibDir)\AWSSDK.dll" "$(LibDir)\Ionic.Zlib.dll"'/>
     <Copy SourceFiles="$(BuildDir)\Console\SThreeQL.dll" DestinationFolder="$(BuildDir)\Service"/>
 
     <Message Text='Merging assemblies into "s3ql.exe".'/>
-    <Exec Command='"$(ILMergePath)" /ndebug /internalize /out:"$(BuildDir)\Console\s3ql.exe" "$(ConsoleOutDir)\s3ql.exe" "$(LibDir)\NDesk.Options.dll"'/>
+    <Exec Command='"$(ILMergePath)" /ndebug /internalize $(ConsoleKeyFile) /out:"$(BuildDir)\Console\s3ql.exe" "$(ConsoleOutDir)\s3ql.exe" "$(LibDir)\NDesk.Options.dll"'/>
     <Copy SourceFiles="$(MSBuildProjectDirectory)\Source\App.config.template" DestinationFiles="$(BuildDir)\Console\s3ql.exe.config"/>
 
     <Copy SourceFiles="$(ServiceOutDir)\s3qlservice.exe" DestinationFolder="$(BuildDir)\Service"/> 

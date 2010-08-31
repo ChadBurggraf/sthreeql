@@ -2,6 +2,7 @@
 *.csproj.user
 *.vsmdi
 *.sln.cache
+*.pfx
 App.config
 bin/
 obj/
