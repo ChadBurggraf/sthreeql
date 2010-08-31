@@ -2,7 +2,8 @@
 *.csproj.user
 *.vsmdi
 *.sln.cache
-*.pfx
+*.snk
+StyleCop.Cache
 App.config
 bin/
 obj/
