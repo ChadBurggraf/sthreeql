@@ -41,52 +41,5 @@
   <Groups />
   <Settings />
  </Rules>
- <FxCopReport Version="10.0">
-  <Targets>
-   <Target Name="$(ProjectDir)/SThreeQL.Console/bin/Debug/s3ql.exe">
-    <Modules>
-     <Module Name="s3ql.exe">
-      <Messages>
-       <Message TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210" Created="2010-08-31 05:28:02Z">
-        <Issue Name="NoStrongName">
-         <Item>'s3ql.exe'</Item>
-        </Issue>
-       </Message>
-      </Messages>
-     </Module>
-    </Modules>
-   </Target>
-   <Target Name="$(ProjectDir)/SThreeQL.Service/bin/Debug/s3qlservice.exe">
-    <Modules>
-     <Module Name="s3qlservice.exe">
-      <Messages>
-       <Message TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210" Created="2010-08-31 05:33:01Z">
-        <Issue Name="NoStrongName">
-         <Item>'s3qlservice.exe'</Item>
-        </Issue>
-       </Message>
-      </Messages>
-     </Module>
-    </Modules>
-   </Target>
-   <Target Name="$(ProjectDir)/SThreeQL/bin/Debug/SThreeQL.dll">
-    <Modules>
-     <Module Name="sthreeql.dll">
-      <Messages>
-       <Message TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210" Created="2010-08-31 05:06:02Z">
-        <Issue Name="NoStrongName">
-         <Item>'SThreeQL.dll'</Item>
-        </Issue>
-       </Message>
-      </Messages>
-     </Module>
-    </Modules>
-   </Target>
-  </Targets>
-  <Rules>
-   <Rule TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210">
-    <Resolution Name="NoStrongName">Sign {0} with a strong name key.</Resolution>
-   </Rule>
-  </Rules>
- </FxCopReport>
+ <FxCopReport Version="10.0" />
 </FxCopProject>
