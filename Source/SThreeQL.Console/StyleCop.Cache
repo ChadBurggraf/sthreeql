@@ -1,15 +1,33 @@
 <stylecopresultscache>
   <version>10</version>
   <project key="-329257508">
-    <configuration>DEBUG;TRACE</configuration>
+    <configuration>TRACE</configuration>
   </project>
+  <sourcecode name="AssemblyInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>10/29/2009 08:55:06</timestamp>
+      <milliseconds>0</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>297</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SolutionInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>10/29/2009 08:55:06</timestamp>
+      <milliseconds>0</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>960</milliseconds>
+    <violations />
+  </sourcecode>
   <sourcecode name="SThreeQLConsole.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
     <settings>
       <timestamp>10/29/2009 08:55:06</timestamp>
       <milliseconds>0</milliseconds>
     </settings>
-    <timestamp>08/29/2010 23:26:00</timestamp>
-    <milliseconds>754</milliseconds>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>307</milliseconds>
     <violations />
   </sourcecode>
 </stylecopresultscache>

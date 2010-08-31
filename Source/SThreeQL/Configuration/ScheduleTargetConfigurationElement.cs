@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="ScheduleTargetConfigurationElement.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 

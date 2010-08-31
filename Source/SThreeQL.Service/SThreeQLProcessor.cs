@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="SThreeQLProcessor.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ namespace SThreeQL.Service
         /// <param name="e">The event arguments.</param>
         private void ScheduleComplete(object sender, ScheduleEventArgs e)
         {
-            LogMessage(false, "Finished all targets in schedule '{1}'.", e.Name);
+            LogMessage(false, "Finished all targets in schedule '{0}'.", e.Name);
         }
 
         /// <summary>

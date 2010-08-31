@@ -1,302 +1,5 @@
 <stylecopresultscache>
   <version>10</version>
-  <sourcecode name="Scheduler.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:28:09</timestamp>
-    <milliseconds>208</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="BucketListResponseItem.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:29:44</timestamp>
-    <milliseconds>854</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="GZipCompressor.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:30:18</timestamp>
-    <milliseconds>282</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="Primitives.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:32:02</timestamp>
-    <milliseconds>391</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="SqlScript.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:33:26</timestamp>
-    <milliseconds>6</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="TaskExecutionResult.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:34:38</timestamp>
-    <milliseconds>807</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="SThreeQLConfiguration.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:37:19</timestamp>
-    <milliseconds>823</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="DatabaseRestoreTargetConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:33:57</timestamp>
-    <milliseconds>83</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="DatabaseTargetConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:37:28</timestamp>
-    <milliseconds>506</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="DataSourceConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:38:40</timestamp>
-    <milliseconds>563</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ScheduleConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:53:21</timestamp>
-    <milliseconds>724</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ScheduleTargetConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:54:28</timestamp>
-    <milliseconds>28</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="AWSTask.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:29:03</timestamp>
-    <milliseconds>93</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="BackupTask.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:40:53</timestamp>
-    <milliseconds>327</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="AWSTargetConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:32:11</timestamp>
-    <milliseconds>623</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="AWSTargetConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:48:13</timestamp>
-    <milliseconds>941</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="DataSourceConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:52:45</timestamp>
-    <milliseconds>648</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ScheduleConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:39:59</timestamp>
-    <milliseconds>151</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:30:49</timestamp>
-    <milliseconds>538</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ScheduleTargetConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:40:39</timestamp>
-    <milliseconds>365</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="DatabaseTargetEventArgs.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 13:36:50</timestamp>
-    <milliseconds>190</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ICompressor.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:30:37</timestamp>
-    <milliseconds>548</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="RestoreDatabaseTargetEventArgs.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 13:27:06</timestamp>
-    <milliseconds>776</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ScheduleEventArgs.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:10:57</timestamp>
-    <milliseconds>521</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ScheduleOperationType.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 14:54:25</timestamp>
-    <milliseconds>365</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="ScheduleRepeatType.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:40:06</timestamp>
-    <milliseconds>586</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="Task.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 15:33:42</timestamp>
-    <milliseconds>567</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="TransferInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 13:36:25</timestamp>
-    <milliseconds>215</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="RestoreTask.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:41:01</timestamp>
-    <milliseconds>83</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="DatabaseTargetConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:55:11</timestamp>
-    <milliseconds>141</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="DatabaseRestoreTargetConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:56:08</timestamp>
-    <milliseconds>788</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="AssemblyInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:55:33</timestamp>
-    <milliseconds>529</milliseconds>
-    <violations />
-  </sourcecode>
-  <sourcecode name="SolutionInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
-    <settings>
-      <timestamp>08/29/2010 13:30:31</timestamp>
-      <milliseconds>215</milliseconds>
-    </settings>
-    <timestamp>08/29/2010 16:55:58</timestamp>
-    <milliseconds>551</milliseconds>
-    <violations />
-  </sourcecode>
   <project key="1337452307">
     <configuration>TRACE</configuration>
   </project>
@@ -307,6 +10,306 @@
     </settings>
     <timestamp>08/29/2010 16:56:15</timestamp>
     <milliseconds>944</milliseconds>
+    <violations />
+  </sourcecode>
+  <project key="-257855487">
+    <configuration>TRACE</configuration>
+  </project>
+  <sourcecode name="AWSTask.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:19</timestamp>
+    <milliseconds>25</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="BackupTask.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>337</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="BucketListResponseItem.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>378</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="AWSTargetConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>467</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="AWSTargetConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>506</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="DatabaseRestoreTargetConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>519</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="DatabaseRestoreTargetConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>609</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="DatabaseTargetConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>617</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="DatabaseTargetConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>624</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>513</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="DataSourceConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>717</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="DataSourceConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>666</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ScheduleConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>767</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ScheduleConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>722</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ScheduleTargetConfigurationElement.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>824</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ScheduleTargetConfigurationElementCollection.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>831</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="DatabaseTargetEventArgs.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>887</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SThreeQLConfiguration.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>882</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ICompressor.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>941</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="GZipCompressor.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>894</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="AssemblyInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>954</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="Primitives.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>948</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SolutionInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:13</timestamp>
+    <milliseconds>960</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="RestoreDatabaseTargetEventArgs.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>6</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ScheduleEventArgs.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>108</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ScheduleOperationType.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>156</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="RestoreTask.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>60</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="ScheduleRepeatType.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>211</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="SqlScript.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>219</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="Task.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>276</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="TaskExecutionResult.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>283</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="Scheduler.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>164</milliseconds>
+    <violations />
+  </sourcecode>
+  <sourcecode name="TransferInfo.cs" parser="Microsoft.StyleCop.CSharp.CsParser">
+    <settings>
+      <timestamp>08/30/2010 21:48:48</timestamp>
+      <milliseconds>645</milliseconds>
+    </settings>
+    <timestamp>08/30/2010 21:50:14</timestamp>
+    <milliseconds>290</milliseconds>
     <violations />
   </sourcecode>
 </stylecopresultscache>

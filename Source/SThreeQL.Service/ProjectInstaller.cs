@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="ProjectInstaller.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace SThreeQL.Service
         /// </summary>
         public ProjectInstaller()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="Task.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -15,7 +15,6 @@ namespace SThreeQL
     /// </summary>
     public abstract class Task
     {
-        private static readonly object locker = new object();
         private string tempDir;
 
         /// <summary>

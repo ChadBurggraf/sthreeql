@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="RestoreTask.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -10,6 +10,7 @@ namespace SThreeQL
     using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -20,9 +21,8 @@ namespace SThreeQL
     /// <summary>
     /// Represents a task for executing the restore procedure on a restore target.
     /// </summary>
-    public class RestoreTask : AWSTask
+    public class RestoreTask : AwsTask
     {
-        private static readonly object locker = new object();
         private string awsPrefix;
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace SThreeQL
         /// </summary>
         /// <param name="target">The restore target to execute.</param>
         public RestoreTask(DatabaseRestoreTargetConfigurationElement target)
-            : base(SThreeQLConfiguration.Section.AWSTargets[target.AWSBucketName]) 
+            : base(SThreeQLConfiguration.Section.AwsTargets[target.AwsBucketName]) 
         {
             this.Target = target;
         }
@@ -76,17 +76,18 @@ namespace SThreeQL
         public DatabaseRestoreTargetConfigurationElement Target { get; protected set; }
 
         /// <summary>
-        /// Gets the AWS prefix to use when searching for a backup set to restore.
+        /// Gets the Aws prefix to use when searching for a backup set to restore.
         /// </summary>
-        protected string AWSPrefix
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+        protected string AwsPrefix
         {
             get
             {
                 if (this.awsPrefix == null)
                 {
-                    if (!String.IsNullOrEmpty(this.Target.AWSPrefix))
+                    if (!String.IsNullOrEmpty(this.Target.AwsPrefix))
                     {
-                        this.awsPrefix = this.Target.AWSPrefix;
+                        this.awsPrefix = this.Target.AwsPrefix;
 
                         if (!this.awsPrefix.EndsWith("/", StringComparison.Ordinal))
                         {
@@ -128,7 +129,7 @@ namespace SThreeQL
         }
 
         /// <summary>
-        /// Downloads the latest backup set from the AWS service.
+        /// Downloads the latest backup set from the Aws service.
         /// </summary>
         /// <returns>The path to the downloaded and decompressed backup file.</returns>
         public string DownloadBackup()
@@ -137,7 +138,7 @@ namespace SThreeQL
         }
 
         /// <summary>
-        /// Downloads the latest backup set from the AWS service.
+        /// Downloads the latest backup set from the Aws service.
         /// </summary>
         /// <param name="compressor">The compresor to use when decompressing the downloaded file.</param>
         /// <returns>The path to the downloaded and decompressed backup file.</returns>
@@ -146,11 +147,11 @@ namespace SThreeQL
             S3Object latest = this.GetLatestBackupItem();
             string path = latest.Key;
 
-            if (!String.IsNullOrEmpty(this.Target.AWSPrefix) && path.StartsWith(this.Target.AWSPrefix, StringComparison.OrdinalIgnoreCase))
+            if (!String.IsNullOrEmpty(this.Target.AwsPrefix) && path.StartsWith(this.Target.AwsPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                path = path.Substring(this.Target.AWSPrefix.Length);
+                path = path.Substring(this.Target.AwsPrefix.Length);
 
-                if (path.StartsWith("/")) 
+                if (path.StartsWith("/", StringComparison.Ordinal)) 
                 {
                     path = path.Substring(1);
                 }
@@ -165,7 +166,7 @@ namespace SThreeQL
             }
 
             GetObjectRequest request = new GetObjectRequest()
-                .WithBucketName(AWSConfig.BucketName)
+                .WithBucketName(AwsConfig.BucketName)
                 .WithKey(latest.Key);
 
             TransferInfo info = new TransferInfo()
@@ -210,6 +211,7 @@ namespace SThreeQL
         /// Executes the task.
         /// </summary>
         /// <returns>The result of the execution.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We want to log exceptions rather than bail.")]
         public override TaskExecutionResult Execute()
         {
             TaskExecutionResult result = new TaskExecutionResult() { Target = this.Target };
@@ -222,7 +224,6 @@ namespace SThreeQL
             }
             catch (Exception ex)
             {
-                throw;
                 result.Exception = ex;
                 result.Success = false;
             }
@@ -263,6 +264,7 @@ namespace SThreeQL
                         command.CommandTimeout = SThreeQLConfiguration.Section.DatabaseTimeout;
                         command.CommandType = CommandType.Text;
                         command.CommandText = String.Format(
+                            CultureInfo.InvariantCulture,
                             new SqlScript("Drop.sql").Text,
                             this.Target.RestoreCatalogName);
 
@@ -288,7 +290,7 @@ namespace SThreeQL
 
                 try
                 {
-                    DataTable files = new DataTable();
+                    DataTable files = new DataTable() { Locale = CultureInfo.InvariantCulture };
 
                     using (SqlCommand command = connection.CreateCommand())
                     {
@@ -325,7 +327,7 @@ namespace SThreeQL
                             sb.Append(String.Concat("\tMOVE @FileName", i, " TO @FilePath", i, ",\n"));
                         }
 
-                        command.CommandText = String.Format(new SqlScript("Restore.sql").Text, sb.ToString());
+                        command.CommandText = String.Format(CultureInfo.InvariantCulture, new SqlScript("Restore.sql").Text, sb.ToString());
                         command.ExecuteNonQuery();
                     }
                 }
@@ -373,8 +375,8 @@ namespace SThreeQL
             while (truncated)
             {
                 ListObjectsRequest request = new ListObjectsRequest()
-                    .WithBucketName(AWSConfig.BucketName)
-                    .WithPrefix(this.AWSPrefix)
+                    .WithBucketName(AwsConfig.BucketName)
+                    .WithPrefix(this.AwsPrefix)
                     .WithMarker(marker);
 
                 using (ListObjectsResponse response = S3Client.ListObjects(request))

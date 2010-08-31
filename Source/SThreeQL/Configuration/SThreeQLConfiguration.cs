@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="SThreeQLConfiguration.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -8,6 +8,7 @@ namespace SThreeQL.Configuration
 {
     using System;
     using System.Configuration;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Represents the SThreeQL configuration section.
@@ -26,9 +27,10 @@ namespace SThreeQL.Configuration
         /// Gets the collection of AWS targets defined for backup/restore scenarios.
         /// </summary>
         [ConfigurationProperty("awsTargets")]
-        public AWSTargetConfigurationElementCollection AWSTargets
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+        public AwsTargetConfigurationElementCollection AwsTargets
         {
-            get { return (AWSTargetConfigurationElementCollection)(this["awsTargets"] ?? (this["awsTargets"] = new AWSTargetConfigurationElementCollection())); }
+            get { return (AwsTargetConfigurationElementCollection)(this["awsTargets"] ?? (this["awsTargets"] = new AwsTargetConfigurationElementCollection())); }
         }
 
         /// <summary>
@@ -78,10 +80,10 @@ namespace SThreeQL.Configuration
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use SSL when communicating with AWS.
+        /// Gets or sets a value indicating whether to use SSL when communicating with Aws.
         /// </summary>
         [ConfigurationProperty("useSsl", IsRequired = false)]
-        public bool UseSSL
+        public bool UseSsl
         {
             get { return (bool)this["useSsl"]; }
             set { this["useSsl"] = value; }

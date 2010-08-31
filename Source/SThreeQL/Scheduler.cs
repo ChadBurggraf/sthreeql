@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="Scheduler.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -8,6 +8,7 @@ namespace SThreeQL
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using SThreeQL.Configuration;
@@ -206,12 +207,13 @@ namespace SThreeQL
         /// Executes the given schedule.
         /// </summary>
         /// <param name="schd">The schedule object to execute.</param>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We want to log exceptions rather than bail.")]
         private void ExecuteSchedule(object schd)
         {
             ScheduleConfigurationElement schedule = (ScheduleConfigurationElement)schd;
             this.Fire(this.ScheduleStart, schedule, null, null);
 
-            foreach (ScheduleTargetConfigurationElement target in schedule.BackupTagets)
+            foreach (ScheduleTargetConfigurationElement target in schedule.BackupTargets)
             {
                 DatabaseTargetConfigurationElement config = null;
 

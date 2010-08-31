@@ -1,12 +1,13 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="AWSTask.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+// <copyright file="AwsTask.cs" company="Tasty Codes">
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
 namespace SThreeQL
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Net;
     using System.Net.Security;
     using System.Security.Cryptography.X509Certificates;
@@ -16,9 +17,10 @@ namespace SThreeQL
     using SThreeQL.Configuration;
 
     /// <summary>
-    /// Base <see cref="Task"/> implementation for tasks needing an AWS service.
+    /// Base <see cref="Task"/> implementation for tasks needing an Aws service.
     /// </summary>
-    public abstract class AWSTask : Task
+    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+    public abstract class AwsTask : Task
     {
         /// <summary>
         /// Gets the number of seconds to use for SQL connection timeouts.
@@ -29,40 +31,42 @@ namespace SThreeQL
         private static bool servicePointInitialized;
 
         /// <summary>
-        /// Initializes a new instance of the AWSTask class.
+        /// Initializes a new instance of the AwsTask class.
         /// </summary>
-        /// <param name="awsConfig">The <see cref="AWSTargetConfigurationElement"/> to use when building the AWS service.</param>
-        protected AWSTask(AWSTargetConfigurationElement awsConfig)
+        /// <param name="awsConfig">The <see cref="AwsTargetConfigurationElement"/> to use when building the Aws service.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+        protected AwsTask(AwsTargetConfigurationElement awsConfig)
         {
             if (awsConfig == null)
             {
-                throw new ArgumentNullException("awsConfig cannot be null.");
+                throw new ArgumentNullException("awsConfig", "awsConfig cannot be null.");
             }
 
             EnsureServicePointInitialized();
-            this.AWSConfig = awsConfig;
+            this.AwsConfig = awsConfig;
 
             AmazonS3Config sthreeConfig = new AmazonS3Config()
             {
-                CommunicationProtocol = SThreeQLConfiguration.Section.UseSSL ? Protocol.HTTPS : Protocol.HTTP
+                CommunicationProtocol = SThreeQLConfiguration.Section.UseSsl ? Protocol.HTTPS : Protocol.HTTP
             };
 
-            this.S3Client = AWSClientFactory.CreateAmazonS3Client(awsConfig.AWSAccessKeyId, awsConfig.AWSSecretAccessKeyId, sthreeConfig);
+            this.S3Client = AWSClientFactory.CreateAmazonS3Client(awsConfig.AwsAccessKeyId, awsConfig.AwsSecretAccessKeyId, sthreeConfig);
         }
 
         /// <summary>
-        /// Gets the AWS configuration element used to build this instance's AWS service.
+        /// Gets the Aws configuration element used to build this instance's Aws service.
         /// </summary>
-        protected AWSTargetConfigurationElement AWSConfig { get; private set; }
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+        protected AwsTargetConfigurationElement AwsConfig { get; private set; }
 
         /// <summary>
-        /// Gets the AWS S3 client;
+        /// Gets the Aws S3 client;
         /// </summary>
         protected AmazonS3 S3Client { get; private set; }
 
         /// <summary>
         /// Ensures the <see cref="ServicePointManager"/> is initialized to accept all SSL certificates.
-        /// We're only making AWS calls, so I think we can blindly trust their certificates.
+        /// We're only making Aws calls, so I think we can blindly trust their certificates.
         /// </summary>
         private static void EnsureServicePointInitialized()
         {

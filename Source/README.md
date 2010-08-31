@@ -19,9 +19,21 @@ backups to a staging machine for up-to-date testing data.
 
 ## Building
 
-There are no prerequisites for building, except that you must add `App.config` files
-to each executable project in the solution. An `App.config.template` file exists and
-is aliased in each project for reference.
+**Prereqresites:**
+
+  - You must have [MSBuild Community Tasks](http://msbuildtasks.tigris.org/) installed
+  
+To build:
+
+    MSBuild.exe build.proj
+    
+The build script requires MSBuild v3.5 (on my machine, this is located at 
+`C:\Windows\Microsoft.NET\Framework\v3.5\MSBuild.exe`).
+
+This will create a release build. If you'd like to hack, you can use the Visual Studio
+solution for building. To do this, first create `App.config` files for each executable project (`SThreeQL.Console`,
+`SThreeQL.Service` and `SThreeQL.Test`). Copy the contents of `App.config.template` into
+each file. Configure to taste.
 
 ## Configuring
 
@@ -29,7 +41,7 @@ All configuration happens within each executable's `.config` file. Basically,
 you need to set up your Amazon S3 targets, your backup and/or restore data sources,
 your backup and/or restore target definitions and any schedules you want to define.
 
-Take a look at `SThreeQL.Configuration` for reference on what is required, what is
+Take a look at the `SThreeQL.Configuration` namespace for reference on what is required, what is
 inferred and so forth.
 
 Please note that **you need permission to drop and restore databases** for each data 

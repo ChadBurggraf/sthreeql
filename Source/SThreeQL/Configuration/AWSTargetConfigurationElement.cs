@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="AWSTargetConfigurationElement.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+// <copyright file="AwsTargetConfigurationElement.cs" company="Tasty Codes">
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -8,17 +8,20 @@ namespace SThreeQL.Configuration
 {
     using System;
     using System.Configuration;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Represents an Amazon S3 storage target configuration element.
     /// </summary>
-    public class AWSTargetConfigurationElement : ConfigurationElement
+    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+    public class AwsTargetConfigurationElement : ConfigurationElement
     {
         /// <summary>
         /// Gets or sets the target's access key ID.
         /// </summary>
         [ConfigurationProperty("awsAccessKeyId", IsRequired = true)]
-        public string AWSAccessKeyId
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+        public string AwsAccessKeyId
         {
             get { return (string)this["awsAccessKeyId"]; }
             set { this["awsAccessKeyId"] = value; }
@@ -28,7 +31,8 @@ namespace SThreeQL.Configuration
         /// Gets or sets the target's secret access key ID.
         /// </summary>
         [ConfigurationProperty("awsSecretAccessKeyId", IsRequired = true)]
-        public string AWSSecretAccessKeyId
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+        public string AwsSecretAccessKeyId
         {
             get { return (string)this["awsSecretAccessKeyId"]; }
             set { this["awsSecretAccessKeyId"] = value; }

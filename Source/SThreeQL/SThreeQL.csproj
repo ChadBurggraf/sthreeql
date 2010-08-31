@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\SThreeQL.xml</DocumentationFile>
@@ -59,11 +59,10 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Configuration\AWSTargetConfigurationElement.cs" />
-    <Compile Include="Configuration\AWSTargetConfigurationElementCollection.cs" />
-    <Compile Include="AWSTask.cs" />
+    <Compile Include="Configuration\AwsTargetConfigurationElement.cs" />
+    <Compile Include="Configuration\AwsTargetConfigurationElementCollection.cs" />
+    <Compile Include="AwsTask.cs" />
     <Compile Include="BackupTask.cs" />
-    <Compile Include="BucketListResponseItem.cs" />
     <Compile Include="Configuration\ConfigurationElementCollection.cs" />
     <Compile Include="Configuration\DatabaseRestoreTargetConfigurationElement.cs" />
     <Compile Include="Configuration\DatabaseRestoreTargetConfigurationElementCollection.cs" />

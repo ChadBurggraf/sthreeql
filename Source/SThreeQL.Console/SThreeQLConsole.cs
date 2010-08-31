@@ -1,12 +1,13 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="SThreeQLConsole.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
 namespace SThreeQL.Console
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using NDesk.Options;
     using SThreeQL.Configuration;
@@ -14,8 +15,15 @@ namespace SThreeQL.Console
     /// <summary>
     /// Provides console-based execution of SThreeQL tasks.
     /// </summary>
-    public class SThreeQLConsole
+    public sealed class SThreeQLConsole
     {
+        /// <summary>
+        /// Prevents initialization of the SThreeQLConsole class.
+        /// </summary>
+        private SThreeQLConsole()
+        {
+        }
+
         /// <summary>
         /// Application entry point.
         /// </summary>
@@ -188,6 +196,7 @@ namespace SThreeQL.Console
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.WriteLine();
             Console.WriteLine("Upload complete.");
+            Console.WriteLine();
             Console.ResetColor();
         }
 
@@ -237,15 +246,12 @@ namespace SThreeQL.Console
                     WriteError("There is no backup target defined for '{0}'.", target);
                     return false;
                 }
-
-                Console.WriteLine();
             }
             else
             {
                 foreach (var element in SThreeQLConfiguration.Section.BackupTargets)
                 {
                     ExecuteBackup(element);
-                    Console.WriteLine();
                 }
             }
 
@@ -256,6 +262,7 @@ namespace SThreeQL.Console
         /// Executes a backup operation.
         /// </summary>
         /// <param name="target">The target to execute.</param>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We want to log exceptions rather than bail.")]
         private static void ExecuteBackup(DatabaseTargetConfigurationElement target)
         {
             try
@@ -302,15 +309,12 @@ namespace SThreeQL.Console
                     WriteError("There is no restore target defined for '{0}'.", target);
                     return false;
                 }
-
-                Console.WriteLine();
             }
             else
             {
                 foreach (var element in SThreeQLConfiguration.Section.RestoreTargets)
                 {
                     ExecuteRestore(element);
-                    Console.WriteLine();
                 }
             }
 
@@ -321,6 +325,7 @@ namespace SThreeQL.Console
         /// Executes a restore operation.
         /// </summary>
         /// <param name="target">The target to execute.</param>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We want to log exceptions rather than bail.")]
         private static void ExecuteRestore(DatabaseRestoreTargetConfigurationElement target)
         {
             try
@@ -343,7 +348,6 @@ namespace SThreeQL.Console
             }
             catch (Exception ex)
             {
-                throw;
                 WriteError(ex);
             }
         }
@@ -402,6 +406,7 @@ namespace SThreeQL.Console
         {
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("done.");
+            Console.WriteLine();
             Console.ResetColor();
         }
 

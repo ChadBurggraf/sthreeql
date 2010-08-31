@@ -1,12 +1,14 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="Primitives.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
 namespace SThreeQL
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -25,7 +27,7 @@ namespace SThreeQL
             const decimal MB = KB * 1024;
             const decimal GB = MB * 1024;
 
-            decimal size = Convert.ToDecimal(bytes);
+            decimal size = Convert.ToDecimal(bytes, CultureInfo.InvariantCulture);
             string suffix = " B";
             string format = "N0";
 
@@ -47,7 +49,7 @@ namespace SThreeQL
                 suffix = " KB";
             }
 
-            return size.ToString(format) + suffix;
+            return size.ToString(format, CultureInfo.InvariantCulture) + suffix;
         }
 
         /// <summary>
@@ -57,9 +59,10 @@ namespace SThreeQL
         /// <param name="value">The object to convert.</param>
         /// <param name="defaultValue">The default value to use if empty.</param>
         /// <returns>An integer.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", Justification = "I honestly have no idea what else to name it.")]
         public static int ToIntWithDefault(this object value, int defaultValue)
         {
-            int ret = Convert.ToInt32(value ?? 0);
+            int ret = Convert.ToInt32(value ?? 0, CultureInfo.InvariantCulture);
 
             if (ret == 0)
             {
@@ -75,10 +78,10 @@ namespace SThreeQL
         /// </summary>
         /// <param name="dateTime">The DateTime object to convert.</param>
         /// <returns>A given date as a string.</returns>
-        public static string ToISO8601UTCString(this DateTime dateTime)
+        public static string ToIso8601UtcString(this DateTime dateTime)
         {
             dateTime = dateTime.ToUniversalTime();
-            return String.Format("{0:s}.{0:fff}Z", dateTime);
+            return String.Format(CultureInfo.InvariantCulture, "{0:s}.{0:fff}Z", dateTime);
         }
 
         /// <summary>
@@ -88,9 +91,9 @@ namespace SThreeQL
         /// </summary>
         /// <param name="dateTime">The DateTime object to convert.</param>
         /// <returns>The given date as a string.</returns>
-        public static string ToISO8601UTCPathSafeString(this DateTime dateTime)
+        public static string ToIso8601UtcPathSafeString(this DateTime dateTime)
         {
-            return Regex.Replace(dateTime.ToISO8601UTCString(), @"[\.:]", "-");
+            return Regex.Replace(dateTime.ToIso8601UtcString(), @"[\.:]", "-");
         }
 
         /// <summary>

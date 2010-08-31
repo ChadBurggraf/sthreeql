@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="ScheduleConfigurationElement.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ namespace SThreeQL.Configuration
         /// Gets the schedule's backup targets collection.
         /// </summary>
         [ConfigurationProperty("backupTargets")]
-        public ScheduleTargetConfigurationElementCollection BackupTagets
+        public ScheduleTargetConfigurationElementCollection BackupTargets
         {
             get { return (ScheduleTargetConfigurationElementCollection)(this["backupTargets"] ?? (this["backupTargets"] = new ScheduleTargetConfigurationElementCollection())); }
         }
@@ -44,13 +44,12 @@ namespace SThreeQL.Configuration
         }
 
         /// <summary>
-        /// Gets or sets the schedule's restore targets collection.
+        /// Gets the schedule's restore targets collection.
         /// </summary>
         [ConfigurationProperty("restoreTargets")]
         public ScheduleTargetConfigurationElementCollection RestoreTargets
         {
             get { return (ScheduleTargetConfigurationElementCollection)(this["restoreTargets"] ?? (this["restoreTargets"] = new ScheduleTargetConfigurationElementCollection())); }
-            set { this["restoreTargets"] = value; }
         }
 
         /// <summary>

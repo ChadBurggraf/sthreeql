@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="AWSTargetConfigurationElementCollection.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+// <copyright file="AwsTargetConfigurationElementCollection.cs" company="Tasty Codes">
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -8,21 +8,23 @@ namespace SThreeQL.Configuration
 {
     using System;
     using System.Configuration;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     /// <summary>
-    /// Represents a collection of <see cref="AWSTargetConfigurationElement"/>s.
+    /// Represents a collection of <see cref="AwsTargetConfigurationElement"/>s.
     /// </summary>
-    public class AWSTargetConfigurationElementCollection : ConfigurationElementCollection<AWSTargetConfigurationElement>
+    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+    public class AwsTargetConfigurationElementCollection : ConfigurationElementCollection<AwsTargetConfigurationElement>
     {
         /// <summary>
         /// Gets the element with the given key from the collection.
         /// </summary>
         /// <param name="bucketName">The name of the bucket to get the element for.</param>
         /// <returns>The element with the given key.</returns>
-        public new AWSTargetConfigurationElement this[string bucketName]
+        public new AwsTargetConfigurationElement this[string bucketName]
         {
-            get { return (AWSTargetConfigurationElement)BaseGet(bucketName); }
+            get { return (AwsTargetConfigurationElement)BaseGet(bucketName); }
         }
 
         /// <summary>
@@ -30,7 +32,7 @@ namespace SThreeQL.Configuration
         /// </summary>
         /// <param name="item">The item to check for.</param>
         /// <returns>True if the collection contains the item, false otherwise.</returns>
-        public override bool Contains(AWSTargetConfigurationElement item)
+        public override bool Contains(AwsTargetConfigurationElement item)
         {
             return 0 < (from e in this
                         where item.BucketName.Equals(e.BucketName, StringComparison.OrdinalIgnoreCase)
@@ -44,7 +46,7 @@ namespace SThreeQL.Configuration
         /// <returns>The given element's key.</returns>
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((AWSTargetConfigurationElement)element).BucketName;
+            return ((AwsTargetConfigurationElement)element).BucketName;
         }
     }
 }

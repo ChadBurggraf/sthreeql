@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="DatabaseTargetConfigurationElementCollection.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ namespace SThreeQL.Configuration
         /// <returns>The element with the given key.</returns>
         public new DatabaseTargetConfigurationElement this[string name]
         {
-            get { return (DatabaseRestoreTargetConfigurationElement)BaseGet(name); }
+            get { return (DatabaseTargetConfigurationElement)BaseGet(name); }
         }
 
         /// <summary>

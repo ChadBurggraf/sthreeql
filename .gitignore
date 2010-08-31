@@ -1,6 +1,7 @@
 *.suo
 *.csproj.user
 *.vsmdi
+*.sln.cache
 App.config
 bin/
 obj/

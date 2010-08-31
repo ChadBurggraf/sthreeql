@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="BackupTask.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -9,6 +9,7 @@ namespace SThreeQL
     using System;
     using System.Data;
     using System.Data.SqlClient;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Threading;
     using Amazon.S3.Model;
@@ -17,7 +18,7 @@ namespace SThreeQL
     /// <summary>
     /// Represents a task for executing the backup procedure on a backup target.
     /// </summary>
-    public class BackupTask : AWSTask
+    public class BackupTask : AwsTask
     {
         private string backupFileName;
 
@@ -26,7 +27,7 @@ namespace SThreeQL
         /// </summary>
         /// <param name="target">The backup target to execute.</param>
         public BackupTask(DatabaseTargetConfigurationElement target)
-            : base(SThreeQLConfiguration.Section.AWSTargets[target.AWSBucketName]) 
+            : base(SThreeQLConfiguration.Section.AwsTargets[target.AwsBucketName]) 
         {
             this.Target = target;
         }
@@ -83,7 +84,7 @@ namespace SThreeQL
                     this.backupFileName = String.Concat(
                         EscapeCatalogName(this.Target.CatalogName),
                         "_",
-                        DateTime.Now.ToISO8601UTCPathSafeString(),
+                        DateTime.Now.ToIso8601UtcPathSafeString(),
                         ".bak");
                 }
 
@@ -183,6 +184,7 @@ namespace SThreeQL
         /// Executes the task.
         /// </summary>
         /// <returns>The result of the execution.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We want to log exceptions rather than bail.")]
         public override TaskExecutionResult Execute()
         {
             TaskExecutionResult result = new TaskExecutionResult() { Target = this.Target };
@@ -216,18 +218,18 @@ namespace SThreeQL
         }
 
         /// <summary>
-        /// Uploads the backup set to AWS.
+        /// Uploads the backup set to Aws.
         /// </summary>
         /// <param name="path">The path of the compressed backup to upload.</param>
         public void UploadBackup(string path)
         {
             string fileName = Path.GetFileName(path);
 
-            if (!String.IsNullOrEmpty(this.Target.AWSPrefix))
+            if (!String.IsNullOrEmpty(this.Target.AwsPrefix))
             {
-                fileName = this.Target.AWSPrefix.EndsWith("/", StringComparison.Ordinal) ?
-                    this.Target.AWSPrefix + fileName :
-                    this.Target.AWSPrefix + "/" + fileName;
+                fileName = this.Target.AwsPrefix.EndsWith("/", StringComparison.Ordinal) ?
+                    this.Target.AwsPrefix + fileName :
+                    this.Target.AwsPrefix + "/" + fileName;
             }
 
             long fileSize = new FileInfo(path).Length;
@@ -236,7 +238,7 @@ namespace SThreeQL
             {
                 PutObjectRequest request = new PutObjectRequest()
                     .WithCannedACL(S3CannedACL.Private)
-                    .WithBucketName(AWSConfig.BucketName)
+                    .WithBucketName(AwsConfig.BucketName)
                     .WithKey(fileName);
 
                 request.InputStream = file;

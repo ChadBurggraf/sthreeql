@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="DatabaseTargetConfigurationElement.cs" company="Tasty Codes">
-//     Copyright (c) 2010 Tasty Codes.
+//     Copyright (c) 2010 Chad Burggraf.
 // </copyright>
 //-----------------------------------------------------------------------
 
@@ -8,6 +8,7 @@ namespace SThreeQL.Configuration
 {
     using System;
     using System.Configuration;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Text;
 
@@ -17,21 +18,23 @@ namespace SThreeQL.Configuration
     public class DatabaseTargetConfigurationElement : ConfigurationElement
     {
         /// <summary>
-        /// Gets or sets the name of this target's associated AWS bucket.
+        /// Gets or sets the name of this target's associated Aws bucket.
         /// This bucket name must be configured in the awsTargets collection.
         /// </summary>
         [ConfigurationProperty("awsBucketName", IsRequired = true)]
-        public string AWSBucketName
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+        public string AwsBucketName
         {
             get { return (string)this["awsBucketName"]; }
             set { this["awsBucketName"] = value; }
         }
 
         /// <summary>
-        /// Gets or sets the optional prefix to use when when storing this target on AWS.
+        /// Gets or sets the optional prefix to use when when storing this target on Aws.
         /// </summary>
         [ConfigurationProperty("awsPrefix", IsRequired = false)]
-        public string AWSPrefix
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Acronym.")]
+        public string AwsPrefix
         {
             get { return (string)this["awsPrefix"]; }
             set { this["awsBucketName"] = value; }
