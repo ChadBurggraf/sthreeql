@@ -12,8 +12,9 @@
     <AssemblyName>SThreeQL</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>SThreeQL.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -98,9 +99,6 @@
     <EmbeddedResource Include="Sql\Drop.sql" />
     <EmbeddedResource Include="Sql\Backup.sql" />
     <EmbeddedResource Include="Sql\Restore.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SThreeQL.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
