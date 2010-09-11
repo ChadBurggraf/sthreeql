@@ -6,7 +6,7 @@
     <ConsoleDir>$(MSBuildProjectDirectory)\Source\SThreeQL.Console</ConsoleDir>
     <ConsoleOutDir>$(ConsoleDir)\bin\$(Configuration)</ConsoleOutDir>
     <ILMergePath>$(MSBuildProjectDirectory)\Tools\ILMerge\ILMerge.exe</ILMergePath>
-    <KeyFile Condition="'$(KeyFile)' == ''">$(MSBuildProjectDirectory)\Source\SThreeQL.snk</KeyFile>
+    <KeyFile>$(MSBuildProjectDirectory)\Source\SThreeQL.snk</KeyFile>
     <LibDir>$(MSBuildProjectDirectory)\Lib</LibDir>
     <LibraryDir>$(MSBuildProjectDirectory)\Source\SThreeQL</LibraryDir>
     <LibraryOutDir>$(LibraryDir)\bin\$(Configuration)</LibraryOutDir>
@@ -32,7 +32,7 @@
     <RemoveDir Directories="$(BuildDir)"/>
     <MakeDir Directories="$(BuildDir)"/>
 
-    <MSBuild Projects="$(MSBuildProjectDirectory)\Source\SThreeQL.sln" Properties="Configuration=$(Configuration);SignAssembly=$(SignAssembly);AssemblyOriginatorKeyFile=$(AssemblyOriginatorKeyFile)"/>
+    <MSBuild Projects="$(MSBuildProjectDirectory)\Source\SThreeQL.sln" Properties="Configuration=$(Configuration);SignAssembly=$(SignAssembly);AssemblyOriginatorKeyFile=$(KeyFile)"/>
 
     <Message Text='Merging assemblies into "SThreeQL.dll".'/>
     <Exec Command='"$(ILMergePath)" /ndebug $(KeyFileArgs) /out:"$(BuildDir)\SThreeQL.dll" "$(LibraryOutDir)\SThreeQL.dll" "$(LibDir)\Newtonsoft.Json.Net20.dll" "$(LibDir)\AWSSDK.dll" "$(LibDir)\Ionic.Zlib.dll"'/>
