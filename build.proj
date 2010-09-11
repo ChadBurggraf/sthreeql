@@ -1,45 +1,47 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
-  
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <BuildDir Condition="'$(BuildDir)' == ''">$(MSBuildProjectDirectory)\Build</BuildDir>
     <ConsoleDir>$(MSBuildProjectDirectory)\Source\SThreeQL.Console</ConsoleDir>
     <ConsoleOutDir>$(ConsoleDir)\bin\$(Configuration)</ConsoleOutDir>
-    <ILMergePath Condition="'$(ILMergePath)' == ''">$(ProgramFiles)\Microsoft\ILMerge\ILMerge.exe</ILMergePath>
+    <ILMergePath>$(MSBuildProjectDirectory)\Tools\ILMerge\ILMerge.exe</ILMergePath>
+    <KeyFile Condition="'$(KeyFile)' == ''">$(MSBuildProjectDirectory)\Source\SThreeQL.snk</KeyFile>
     <LibDir>$(MSBuildProjectDirectory)\Lib</LibDir>
     <LibraryDir>$(MSBuildProjectDirectory)\Source\SThreeQL</LibraryDir>
     <LibraryOutDir>$(LibraryDir)\bin\$(Configuration)</LibraryOutDir>
     <ServiceDir>$(MSBuildProjectDirectory)\Source\SThreeQL.Service</ServiceDir>
     <ServiceOutDir>$(ServiceDir)\bin\$(Configuration)</ServiceOutDir>
-    <SignAssemblies Condition="'$(SignAssemblies)' == ''">false</SignAssemblies>
   </PropertyGroup>
 
   <Choose>
-    <When Condition="'$(SignAssemblies)' == 'true'">
+    <When Condition="Exists('$(KeyFile)')">
       <PropertyGroup>
-        <ConsoleKeyFile>/keyfile:"$(ConsoleDir)\SThreeQL.Console.snk"</ConsoleKeyFile>
-        <LibraryKeyFile>/keyfile:"$(LibraryDir)\SThreeQL.snk"</LibraryKeyFile>
+        <KeyFileArgs>/keyfile:"$(KeyFile)"</KeyFileArgs>
+        <SignAssembly>true</SignAssembly>
       </PropertyGroup>
     </When>
+    <Otherwise>
+      <PropertyGroup>
+        <SignAssembly>false</SignAssembly>
+      </PropertyGroup>
+    </Otherwise>
   </Choose>
 
   <Target Name="Build">
     <RemoveDir Directories="$(BuildDir)"/>
-    <MakeDir Directories="$(BuildDir)\Console;$(BuildDir)\Service"/>
+    <MakeDir Directories="$(BuildDir)"/>
 
-    <MSBuild Projects="$(MSBuildProjectDirectory)\Source\SThreeQL.sln" Properties="Configuration=$(Configuration)"/>
+    <MSBuild Projects="$(MSBuildProjectDirectory)\Source\SThreeQL.sln" Properties="Configuration=$(Configuration);SignAssembly=$(SignAssembly);AssemblyOriginatorKeyFile=$(AssemblyOriginatorKeyFile)"/>
 
     <Message Text='Merging assemblies into "SThreeQL.dll".'/>
-    <Exec Command='"$(ILMergePath)" /ndebug $(LibraryKeyFile) /out:"$(BuildDir)\Console\SThreeQL.dll" "$(LibraryOutDir)\SThreeQL.dll" "$(LibDir)\AWSSDK.dll" "$(LibDir)\Ionic.Zlib.dll"'/>
-    <Copy SourceFiles="$(BuildDir)\Console\SThreeQL.dll" DestinationFolder="$(BuildDir)\Service"/>
+    <Exec Command='"$(ILMergePath)" /ndebug $(KeyFileArgs) /out:"$(BuildDir)\SThreeQL.dll" "$(LibraryOutDir)\SThreeQL.dll" "$(LibDir)\Newtonsoft.Json.Net20.dll" "$(LibDir)\AWSSDK.dll" "$(LibDir)\Ionic.Zlib.dll"'/>
 
     <Message Text='Merging assemblies into "s3ql.exe".'/>
-    <Exec Command='"$(ILMergePath)" /ndebug /internalize $(ConsoleKeyFile) /out:"$(BuildDir)\Console\s3ql.exe" "$(ConsoleOutDir)\s3ql.exe" "$(LibDir)\NDesk.Options.dll"'/>
-    <Copy SourceFiles="$(MSBuildProjectDirectory)\Source\App.config.template" DestinationFiles="$(BuildDir)\Console\s3ql.exe.config"/>
+    <Exec Command='"$(ILMergePath)" /ndebug /internalize $(KeyFileArgs) /out:"$(BuildDir)\s3ql.exe" "$(ConsoleOutDir)\s3ql.exe" "$(LibDir)\NDesk.Options.dll"'/>
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\Source\App.config.template" DestinationFiles="$(BuildDir)\s3ql.exe.config"/>
 
-    <Copy SourceFiles="$(ServiceOutDir)\s3qlservice.exe" DestinationFolder="$(BuildDir)\Service"/> 
-    <Copy SourceFiles="$(MSBuildProjectDirectory)\Source\App.config.template" DestinationFiles="$(BuildDir)\Service\s3qlservice.exe.config"/>
+    <Copy SourceFiles="$(ServiceOutDir)\s3qlservice.exe" DestinationFolder="$(BuildDir)"/>
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\Source\App.config.template" DestinationFiles="$(BuildDir)\s3qlservice.exe.config"/>
   </Target>
 </Project>

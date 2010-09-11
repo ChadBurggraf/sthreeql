@@ -18,10 +18,6 @@ of client applications, want to backup at least daily, and want to restore the l
 backups to a staging machine for up-to-date testing data.
 
 ## Building
-
-**Prereqresites:**
-
-  - You must have [MSBuild Community Tasks](http://msbuildtasks.tigris.org/) installed
   
 To build:
 
