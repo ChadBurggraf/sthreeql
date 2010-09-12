@@ -21,7 +21,6 @@ namespace SThreeQL
     public class BackupTask : AwsTask
     {
         private string backupFileName;
-        //private TransferInfo transferInfo;
 
         /// <summary>
         /// Initializes a new instance of the BackupTask class.
@@ -240,11 +239,9 @@ namespace SThreeQL
                 PutObjectRequest request = new PutObjectRequest()
                         .WithCannedACL(S3CannedACL.Private)
                         .WithBucketName(AwsConfig.BucketName)
-                        //.WithFilePath(path)
                         .WithKey(fileName);
 
                 request.InputStream = file;
-                //request.PutObjectProgressEvent += new EventHandler<PutObjectProgressArgs>(RequestPutObjectProgressEvent);
 
                 TransferInfo info = new TransferInfo()
                 {

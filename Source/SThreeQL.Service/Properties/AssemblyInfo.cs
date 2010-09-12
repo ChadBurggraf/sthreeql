@@ -4,9 +4,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Resources;
 
-[assembly: AssemblyTitle("SThreeQL")]
-[assembly: Guid("8314754f-4f17-459d-82b3-76da1ca08600")]
+[assembly: AssemblyTitle("SThreeQL Service")]
+[assembly: Guid("14907edc-625f-4b3f-8c2e-e81e4780d91a")]
+[assembly: NeutralResourcesLanguageAttribute("en-US")]
+[assembly: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "I like the name and I'm sticking to it.")]
+[assembly: SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "I like the name and I'm sticking to it.")]
+[assembly: SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Signed during a release build.")]

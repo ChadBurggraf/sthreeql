@@ -18,7 +18,7 @@ namespace SThreeQL.Console
     public sealed class SThreeQLConsole
     {
         /// <summary>
-        /// Prevents initialization of the SThreeQLConsole class.
+        /// Prevents a default instance of the SThreeQLConsole class from being created.
         /// </summary>
         private SThreeQLConsole()
         {

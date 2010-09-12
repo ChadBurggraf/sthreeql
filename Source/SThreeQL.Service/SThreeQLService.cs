@@ -15,7 +15,7 @@ namespace SThreeQL.Service
     public sealed class SThreeQLService
     {
         /// <summary>
-        /// Prevents initialization of the SThreeQLService class.
+        /// Prevents a default instance of the SThreeQLService class from being created.
         /// </summary>
         private SThreeQLService()
         {
