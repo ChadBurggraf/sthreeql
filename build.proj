@@ -35,8 +35,9 @@
     <MSBuild Projects="$(MSBuildProjectDirectory)\Source\SThreeQL.sln" Properties="Configuration=$(Configuration);SignAssembly=$(SignAssembly);AssemblyOriginatorKeyFile=$(KeyFile)"/>
 
     <Message Text='Merging assemblies into "SThreeQL.dll".'/>
-    <Exec Command='"$(ILMergePath)" /ndebug $(KeyFileArgs) /out:"$(BuildDir)\SThreeQL.dll" "$(LibraryOutDir)\SThreeQL.dll" "$(LibDir)\Newtonsoft.Json.Net20.dll" "$(LibDir)\AWSSDK.dll" "$(LibDir)\Ionic.Zlib.dll"'/>
-
+    <Exec Command='"$(ILMergePath)" /ndebug $(KeyFileArgs) /out:"$(BuildDir)\SThreeQL.dll" "$(LibraryOutDir)\SThreeQL.dll" "$(LibDir)\Ionic.Zlib.dll"'/>
+    <Copy SourceFiles="$(ConsoleOutDir)\AWSSDK.dll" DestinationFolder="$(BuildDir)"/>
+    
     <Message Text='Merging assemblies into "s3ql.exe".'/>
     <Exec Command='"$(ILMergePath)" /ndebug /internalize $(KeyFileArgs) /out:"$(BuildDir)\s3ql.exe" "$(ConsoleOutDir)\s3ql.exe" "$(LibDir)\NDesk.Options.dll"'/>
     <Copy SourceFiles="$(MSBuildProjectDirectory)\Source\App.config.template" DestinationFiles="$(BuildDir)\s3ql.exe.config"/>

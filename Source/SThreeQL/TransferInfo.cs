@@ -15,6 +15,27 @@ namespace SThreeQL
     public class TransferInfo
     {
         /// <summary>
+        /// Initializes a new instance of the TransferInfo class.
+        /// </summary>
+        public TransferInfo()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the TransferInfo class.
+        /// </summary>
+        /// <param name="info">The existing <see cref="TransferInfo"/> to construct this instance from.</param>
+        public TransferInfo(TransferInfo info)
+        {
+            if (info != null)
+            {
+                this.BytesTransferred = info.BytesTransferred;
+                this.FileName = info.FileName;
+                this.FileSize = info.FileSize;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the number of bytes transferred.
         /// </summary>
         public long BytesTransferred { get; set; }

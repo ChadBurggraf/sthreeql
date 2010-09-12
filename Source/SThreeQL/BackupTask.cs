@@ -21,6 +21,7 @@ namespace SThreeQL
     public class BackupTask : AwsTask
     {
         private string backupFileName;
+        //private TransferInfo transferInfo;
 
         /// <summary>
         /// Initializes a new instance of the BackupTask class.
@@ -237,11 +238,13 @@ namespace SThreeQL
             using (FileStream file = File.OpenRead(path))
             {
                 PutObjectRequest request = new PutObjectRequest()
-                    .WithCannedACL(S3CannedACL.Private)
-                    .WithBucketName(AwsConfig.BucketName)
-                    .WithKey(fileName);
+                        .WithCannedACL(S3CannedACL.Private)
+                        .WithBucketName(AwsConfig.BucketName)
+                        //.WithFilePath(path)
+                        .WithKey(fileName);
 
                 request.InputStream = file;
+                //request.PutObjectProgressEvent += new EventHandler<PutObjectProgressArgs>(RequestPutObjectProgressEvent);
 
                 TransferInfo info = new TransferInfo()
                 {
@@ -252,7 +255,7 @@ namespace SThreeQL
 
                 bool uploading = true;
 
-                Thread uploadThread = new Thread(new ThreadStart(delegate
+                Thread statusThread = new Thread(new ThreadStart(delegate
                 {
                     while (uploading)
                     {
@@ -262,25 +265,25 @@ namespace SThreeQL
 
                             if (info.BytesTransferred < info.FileSize)
                             {
-                                this.Fire(this.TransferProgress, info);
+                                this.Fire(this.TransferProgress, new TransferInfo(info));
                             }
 
-                            Thread.Sleep(500);
+                            Thread.Sleep(250);
                         }
-                        catch (ObjectDisposedException) 
-                        { 
+                        catch (ObjectDisposedException)
+                        {
                         }
                     }
                 }));
 
-                this.Fire(this.TransferStart, info);
-                uploadThread.Start();
+                this.Fire(this.TransferStart, new TransferInfo(info));
+                statusThread.Start();
 
                 using (S3Response response = S3Client.PutObject(request))
                 {
                     uploading = false;
                     info.BytesTransferred = info.FileSize;
-                    this.Fire(this.TransferComplete, info);
+                    this.Fire(this.TransferComplete, new TransferInfo(info));
                 }
             }
         }
