@@ -239,7 +239,8 @@ namespace SThreeQL
                 PutObjectRequest request = new PutObjectRequest()
                         .WithCannedACL(S3CannedACL.Private)
                         .WithBucketName(AwsConfig.BucketName)
-                        .WithKey(fileName);
+                        .WithKey(fileName)
+                        .WithTimeout(-1);
 
                 request.InputStream = file;
 
