@@ -13,6 +13,7 @@ namespace SThreeQL
     using System.IO;
     using System.Threading;
     using Amazon.S3.Model;
+    using Amazon.S3.Transfer;
     using SThreeQL.Configuration;
 
     /// <summary>
@@ -232,58 +233,32 @@ namespace SThreeQL
                     this.Target.AwsPrefix + "/" + fileName;
             }
 
-            long fileSize = new FileInfo(path).Length;
-
-            using (FileStream file = File.OpenRead(path))
+            TransferInfo info = new TransferInfo()
             {
-                PutObjectRequest request = new PutObjectRequest()
-                        .WithCannedACL(S3CannedACL.Private)
-                        .WithBucketName(AwsConfig.BucketName)
-                        .WithKey(fileName)
-                        .WithTimeout(-1);
+                BytesTransferred = 0,
+                FileName = fileName,
+                FileSize = new FileInfo(path).Length
+            };
 
-                request.InputStream = file;
-
-                TransferInfo info = new TransferInfo()
-                {
-                    BytesTransferred = 0,
-                    FileName = fileName,
-                    FileSize = fileSize
-                };
-
-                bool uploading = true;
-
-                Thread statusThread = new Thread(new ThreadStart(delegate
-                {
-                    while (uploading)
-                    {
-                        try
+            using (TransferUtility transfer = new TransferUtility(S3Client))
+            {
+                TransferUtilityUploadRequest request = new TransferUtilityUploadRequest()
+                    .WithCannedACL(S3CannedACL.Private)
+                    .WithBucketName(AwsConfig.BucketName)
+                    .WithKey(fileName)
+                    .WithTimeout(-1)
+                    .WithSubscriber(
+                        (sender, e) =>
                         {
-                            info.BytesTransferred = file.Position;
-
-                            if (info.BytesTransferred < info.FileSize)
-                            {
-                                this.Fire(this.TransferProgress, new TransferInfo(info));
-                            }
-
-                            Thread.Sleep(250);
-                        }
-                        catch (ObjectDisposedException)
-                        {
-                        }
-                    }
-                }));
+                            info.BytesTransferred = e.TransferredBytes;
+                            this.Fire(this.TransferProgress, new TransferInfo(info));
+                        });
 
                 this.Fire(this.TransferStart, new TransferInfo(info));
-                statusThread.Start();
-
-                using (S3Response response = S3Client.PutObject(request))
-                {
-                    uploading = false;
-                    info.BytesTransferred = info.FileSize;
-                    this.Fire(this.TransferComplete, new TransferInfo(info));
-                }
+                transfer.Upload(request);
             }
+
+            this.Fire(this.TransferComplete, new TransferInfo(info));
         }
 
         /// <summary>
