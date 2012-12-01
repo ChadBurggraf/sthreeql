@@ -16,6 +16,7 @@ namespace SThreeQL
     using System.Linq;
     using System.Text;
     using Amazon.S3.Model;
+    using Amazon.S3.Transfer;
     using SThreeQL.Configuration;
 
     /// <summary>
@@ -165,10 +166,6 @@ namespace SThreeQL
                 File.Delete(path);
             }
 
-            GetObjectRequest request = new GetObjectRequest()
-                .WithBucketName(AwsConfig.BucketName)
-                .WithKey(latest.Key);
-
             TransferInfo info = new TransferInfo()
             {
                 BytesTransferred = 0,
@@ -176,27 +173,25 @@ namespace SThreeQL
                 FileSize = 0
             };
 
-            this.Fire(this.TransferStart, info);
-
-            using (FileStream file = File.Create(path))
+            using (TransferUtility transfer = new TransferUtility(S3Client))
             {
-                using (GetObjectResponse response = S3Client.GetObject(request))
+                TransferUtilityDownloadRequest request = new TransferUtilityDownloadRequest()
+                    .WithBucketName(AwsConfig.BucketName)
+                    .WithFilePath(path)
+                    .WithKey(latest.Key);
+
+                request.WriteObjectProgressEvent += (sender, e) =>
                 {
-                    byte[] buffer = new byte[4096];
-                    int count = 0;
+                    info.BytesTransferred = e.TransferredBytes;
+                    info.FileSize = e.TotalBytes;
+                    this.Fire(this.TransferProgress, new TransferInfo(info));
+                };
 
-                    while (0 < (count = response.ResponseStream.Read(buffer, 0, buffer.Length)))
-                    {
-                        info.BytesTransferred += count;
-                        info.FileSize = response.ContentLength;
-                        file.Write(buffer, 0, count);
-
-                        this.Fire(this.TransferProgress, info);
-                    }
-                }
+                this.Fire(this.TransferStart, new TransferInfo(info));
+                transfer.Download(request);
             }
 
-            this.Fire(this.TransferComplete, info);
+            this.Fire(this.TransferComplete, new TransferInfo(info));
 
             this.Fire(this.DecompressStart);
             string decompressedPath = compressor.Decompress(path);
@@ -358,7 +353,11 @@ namespace SThreeQL
         {
             if (handler != null)
             {
-                handler(this, CreateEventArgs(this, info));
+                this.InvokeOnMainThread(
+                    () =>
+                    {
+                        handler(this, CreateEventArgs(this, info));
+                    });
             }
         }
 

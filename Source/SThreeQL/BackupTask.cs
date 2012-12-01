@@ -245,14 +245,15 @@ namespace SThreeQL
                 TransferUtilityUploadRequest request = new TransferUtilityUploadRequest()
                     .WithCannedACL(S3CannedACL.Private)
                     .WithBucketName(AwsConfig.BucketName)
+                    .WithFilePath(path)
                     .WithKey(fileName)
-                    .WithTimeout(-1)
                     .WithSubscriber(
                         (sender, e) =>
                         {
                             info.BytesTransferred = e.TransferredBytes;
                             this.Fire(this.TransferProgress, new TransferInfo(info));
-                        });
+                        })
+                    .WithTimeout(-1);
 
                 this.Fire(this.TransferStart, new TransferInfo(info));
                 transfer.Upload(request);
@@ -279,7 +280,11 @@ namespace SThreeQL
         {
             if (handler != null)
             {
-                handler(this, CreateEventArgs(this, info));
+                this.InvokeOnMainThread(
+                    () =>
+                    {
+                        handler(this, CreateEventArgs(this, info));
+                    });
             }
         }
     }
