@@ -18,6 +18,7 @@ namespace SThreeQL.Service
     {
         #region Private Fields
 
+        private static readonly object SyncRoot = new object();
         private Scheduler scheduler;
 
         #endregion
@@ -92,15 +93,18 @@ namespace SThreeQL.Service
         {
             const string Source = "SThreeQL Service";
 
-            if (!EventLog.SourceExists(Source))
+            lock (SThreeQLProcessor.SyncRoot)
             {
-                EventLog.CreateEventSource(Source, "Application");
-            }
+                if (!EventLog.SourceExists(Source))
+                {
+                    EventLog.CreateEventSource(Source, "Application");
+                }
 
-            EventLog.WriteEntry(
-                Source, 
-                String.Format(CultureInfo.InvariantCulture, message, args), 
-                isError ? EventLogEntryType.Error : EventLogEntryType.Information);
+                EventLog.WriteEntry(
+                    Source,
+                    String.Format(CultureInfo.InvariantCulture, message, args),
+                    isError ? EventLogEntryType.Error : EventLogEntryType.Information);
+            }
         }
 
         #endregion

@@ -17,6 +17,8 @@ namespace SThreeQL.Console
     /// </summary>
     public sealed class SThreeQLConsole
     {
+        private static readonly object SyncRoot = new object();
+
         /// <summary>
         /// Prevents a default instance of the SThreeQLConsole class from being created.
         /// </summary>
@@ -141,9 +143,12 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void BackupComplete(object sender, DatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("done.");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("done.");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -153,9 +158,12 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void BackupCompressComplete(object sender, DatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("done.");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("done.");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -165,9 +173,12 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void BackupCompressStart(object sender, DatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Compressing the backup file... ");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Compressing the backup file... ");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -177,13 +188,16 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void BackupStart(object sender, DatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Backing up database ");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write(e.CatalogName);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("... ");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Backing up database ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write(e.CatalogName);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("... ");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -193,11 +207,14 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void BackupTransferComplete(object sender, DatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine();
-            Console.WriteLine("Upload complete.");
-            Console.WriteLine();
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine();
+                Console.WriteLine("Upload complete.");
+                Console.WriteLine();
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -217,13 +234,16 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void BackupTransferStart(object sender, DatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Uploading file ");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write(e.Transfer.FileName);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(" ({0})... ", e.Transfer.FileSize.ToFileSize());
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Uploading file ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write(e.Transfer.FileName);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(" ({0})... ", e.Transfer.FileSize.ToFileSize());
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -358,9 +378,12 @@ namespace SThreeQL.Console
         /// <param name="options">The option set to print.</param>
         private static void Help(OptionSet options)
         {
-            Console.WriteLine("Usage: s3ql -a | -b [-t TARGET] | -r [-t TARGET] | -s [-t TARGET]");
-            Console.WriteLine();
-            options.WriteOptionDescriptions(Console.Out);
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.WriteLine("Usage: s3ql -a | -b [-t TARGET] | -r [-t TARGET] | -s [-t TARGET]");
+                Console.WriteLine();
+                options.WriteOptionDescriptions(Console.Out);
+            }
         }
 
         /// <summary>
@@ -369,20 +392,23 @@ namespace SThreeQL.Console
         /// <param name="info">The transfer information.</param>
         private static void OnTransferProgress(TransferInfo info)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-
-            if (info.FileSize > 0 && info.BytesTransferred > 0)
+            lock (SThreeQLConsole.SyncRoot)
             {
-                Console.CursorLeft = 0;
+                Console.ForegroundColor = ConsoleColor.Cyan;
 
-                Console.Write(
-                    "{0} of {1} ({2}%)          ",
-                    info.BytesTransferred.ToFileSize(),
-                    info.FileSize.ToFileSize(),
-                    (int)((double)info.BytesTransferred / info.FileSize * 100));
+                if (info.FileSize > 0 && info.BytesTransferred > 0)
+                {
+                    Console.CursorLeft = 0;
+
+                    Console.Write(
+                        "{0} of {1} ({2}%)          ",
+                        info.BytesTransferred.ToFileSize(),
+                        info.FileSize.ToFileSize(),
+                        (int)((double)info.BytesTransferred / info.FileSize * 100));
+                }
+
+                Console.ResetColor();
             }
-
-            Console.ResetColor();
         }
 
         /// <summary>
@@ -392,9 +418,12 @@ namespace SThreeQL.Console
         /// <param name="exception">The exception that represents the error.</param>
         private static void ParseError(OptionSet options, OptionException exception)
         {
-            Console.Error.WriteLine("s3ql: ", exception.Message);
-            Console.Error.WriteLine();
-            options.WriteOptionDescriptions(Console.Error);
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.Error.WriteLine("s3ql: ", exception.Message);
+                Console.Error.WriteLine();
+                options.WriteOptionDescriptions(Console.Error);
+            }
         }
 
         /// <summary>
@@ -404,10 +433,13 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void RestoreComplete(object sender, RestoreDatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("done.");
-            Console.WriteLine();
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("done.");
+                Console.WriteLine();
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -417,9 +449,12 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void RestoreDecompressComplete(object sender, RestoreDatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("done.");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("done.");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -429,9 +464,12 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void RestoreDecompressStart(object sender, RestoreDatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Decompressing the backup file... ");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Decompressing the backup file... ");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -441,13 +479,16 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void RestoreStart(object sender, RestoreDatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Restoring catalog ");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write(e.RestoreCatalogName);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("... ");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Restoring catalog ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write(e.RestoreCatalogName);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("... ");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -457,10 +498,13 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void RestoreTransferComplete(object sender, RestoreDatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine();
-            Console.WriteLine("Download complete.");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine();
+                Console.WriteLine("Download complete.");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -480,13 +524,16 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void RestoreTransferStart(object sender, RestoreDatabaseTargetEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Downloading file ");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write(e.Transfer.FileName);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("... ");
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Downloading file ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write(e.Transfer.FileName);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("... ");
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -496,14 +543,17 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void ScheduleComplete(object sender, ScheduleEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Schedule ");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write(e.Name);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(" is complete at {0:F}.", DateTime.Now);
-            Console.WriteLine();
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Schedule ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write(e.Name);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(" is complete at {0:F}.", DateTime.Now);
+                Console.WriteLine();
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -537,14 +587,17 @@ namespace SThreeQL.Console
         /// <param name="e">The event arguments.</param>
         private static void ScheduleStart(object sender, ScheduleEventArgs e)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Executing schedule ");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write(e.Name);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(" at {0:F}.", DateTime.Now);
-            Console.WriteLine();
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Executing schedule ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write(e.Name);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(" at {0:F}.", DateTime.Now);
+                Console.WriteLine();
+                Console.ResetColor();
+            }
         }
 
         /// <summary>
@@ -563,9 +616,12 @@ namespace SThreeQL.Console
         /// <param name="args">The arguments to format the message with.</param>
         private static void WriteError(string format, params string[] args)
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine(format, args);
-            Console.ResetColor();
+            lock (SThreeQLConsole.SyncRoot)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine(format, args);
+                Console.ResetColor();
+            }
         }
     }
 }

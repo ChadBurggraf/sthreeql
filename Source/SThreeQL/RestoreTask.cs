@@ -353,11 +353,7 @@ namespace SThreeQL
         {
             if (handler != null)
             {
-                this.InvokeOnMainThread(
-                    () =>
-                    {
-                        handler(this, CreateEventArgs(this, info));
-                    });
+                handler(this, CreateEventArgs(this, info));
             }
         }
 

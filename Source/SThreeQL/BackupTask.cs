@@ -247,13 +247,13 @@ namespace SThreeQL
                     .WithBucketName(AwsConfig.BucketName)
                     .WithFilePath(path)
                     .WithKey(fileName)
-                    .WithSubscriber(
-                        (sender, e) =>
-                        {
-                            info.BytesTransferred = e.TransferredBytes;
-                            this.Fire(this.TransferProgress, new TransferInfo(info));
-                        })
                     .WithTimeout(-1);
+
+                request.UploadProgressEvent += (sender, e) =>
+                {
+                    info.BytesTransferred = e.TransferredBytes;
+                    this.Fire(this.TransferProgress, new TransferInfo(info));
+                };
 
                 this.Fire(this.TransferStart, new TransferInfo(info));
                 transfer.Upload(request);
@@ -280,11 +280,7 @@ namespace SThreeQL
         {
             if (handler != null)
             {
-                this.InvokeOnMainThread(
-                    () =>
-                    {
-                        handler(this, CreateEventArgs(this, info));
-                    });
+                handler(this, CreateEventArgs(this, info));
             }
         }
     }
